@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enterprise Web App — UI Starter Template</title>
+  
+  <!-- 1. Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+  
+  <!-- 2. Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- 3. FontAwesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- 4. Google Fonts: Inter (English & Numbers) + Sarabun (Thai Text) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       DESIGN TOKENS & CSS VARIABLES
+       ========================================================================== */
+    :root {
+      --color-bg:             #F8FAFC;
+      --color-surface:        #FFFFFF;
+      --color-border:         #E2E8F0;
+      --color-border-soft:    #F1F5F9;
+      --color-text-primary:   #0F172A;
+      --color-text-secondary: #64748B;
+      --color-text-tertiary:  #94A3B8;
+      
+      --color-accent:         #2563EB;
+      --color-accent-hover:   #1D4ED8;
+      --color-accent-bg:      #EFF6FF;
+      
+      --color-danger:         #EF4444;
+      --color-danger-bg:      #FEF2F2;
+      --color-warning:        #F59E0B;
+      --color-warning-bg:     #FFFBEB;
+      --color-success:        #10B981;
+      --color-success-bg:     #ECFDF5;
+      
+      --radius-sm:            6px;
+      --radius-md:            10px;
+      --radius-lg:            14px;
+      --radius-xl:            20px;
+      
+      --shadow-xs:            0 1px 2px rgba(0, 0, 0, 0.03);
+      --shadow-sm:            0 2px 6px rgba(15, 23, 42, 0.04);
+      --shadow-md:            0 8px 20px rgba(15, 23, 42, 0.06);
+      --shadow-lg:            0 12px 32px rgba(15, 23, 42, 0.1);
+    }
+
+    * { box-sizing: border-box; }
+
+    /* ==========================================================================
+       TYPOGRAPHY (INTER + SARABUN)
+       ========================================================================== */
+    body {
+      font-family: 'Inter', 'Sarabun', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--color-bg);
+      color: var(--color-text-primary);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Custom Scrollbar */
+    .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 99px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
+    /* ==========================================================================
+       MINIMAL BUTTON SYSTEM (.m-btn)
+       ========================================================================== */
+    .m-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1;
+      padding: 8px 14px;
+      border-radius: var(--radius-md);
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    /* Primary Accent Button */
+    .m-btn-primary {
+      background: var(--color-accent);
+      color: #FFFFFF;
+      box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+    }
+    .m-btn-primary:hover {
+      background: var(--color-accent-hover);
+      transform: translateY(-1px);
+    }
+
+    /* Dark Slate Button */
+    .m-btn-dark {
+      background: #0F172A;
+      color: #FFFFFF;
+      box-shadow: 0 2px 4px rgba(15, 23, 42, 0.2);
+    }
+    .m-btn-dark:hover {
+      background: #1E293B;
+      transform: translateY(-1px);
+    }
+
+    /* Ghost / Border Button */
+    .m-btn-ghost {
+      background: #FFFFFF;
+      color: var(--color-text-secondary);
+      border: 1px solid var(--color-border);
+    }
+    .m-btn-ghost:hover {
+      background: #F8FAFC;
+      color: var(--color-text-primary);
+      border-color: #CBD5E1;
+    }
+
+        /* Danger / Red Button */
+    .m-btn-danger {
+      background: var(--color-danger-bg);
+      color: var(--color-danger);
+      border: 1px solid #FCA5A5;
+    }
+    .m-btn-danger:hover {
+      background: #FEE2E2;
+      border-color: #F87171;
+    }
+
+    /* Ghost Danger Button (Ultra-clean table icon button, turns soft rose on hover) */
+    .m-btn-ghost-danger {
+      background: transparent;
+      color: var(--color-text-tertiary);
+      border: 1px solid var(--color-border);
+    }
+    .m-btn-ghost-danger:hover {
+      background: var(--color-danger-bg);
+      color: var(--color-danger);
+      border-color: #FCA5A5;
+    }
+
+    /* Icon Button (Square 30x30 for table action columns) */
+    .m-btn-icon {
+      padding: 6px;
+      width: 30px;
+      height: 30px;
+      border-radius: var(--radius-md);
+      justify-content: center;
+    }
+
+    /* ==========================================================================
+       CARDS & CONTAINER SYSTEM
+       ========================================================================== */
+    .m-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+    }
+    .m-card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    /* KPI / Quick Metric Filter Card */
+    .m-stat-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-xs);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+    }
+    .m-stat-card:hover {
+      border-color: #CBD5E1;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .m-stat-card.active {
+      border-color: var(--color-accent);
+      background: var(--color-accent-bg);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25), var(--shadow-sm);
+    }
+    .m-stat-card.active::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--color-accent);
+    }
+    .m-stat-card .stat-icon-box {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+
+    /* ==========================================================================
+       TABLE SYSTEM
+       ========================================================================== */
+    .m-table {
+      width: 100%;
+      font-size: 12px;
+      text-align: left;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+    .m-table thead th {
+      position: sticky;
+      top: 0;
+      background: #F8FAFC !important;
+      z-index: 10;
+      padding: 12px 16px !important;
+      font-size: 11px !important;
+      font-weight: 700 !important;
+      color: var(--color-text-secondary) !important;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .m-table tbody tr {
+      border-bottom: 1px solid #F1F5F9;
+      transition: background 0.15s ease;
+    }
+    .m-table tbody tr:hover {
+      background: #F8FAFC;
+    }
+    .m-table tbody td {
+      padding: 12px 16px;
+      color: var(--color-text-secondary);
+      vertical-align: middle;
+    }
+    .m-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* ==========================================================================
+       FORM INPUTS
+       ========================================================================== */
+    .m-input {
+      width: 100%;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: var(--color-text-primary);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      outline: none;
+      transition: all 0.15s ease;
+    }
+    .m-input:focus {
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .m-input::placeholder {
+      color: var(--color-text-tertiary);
+    }
+
+    /* ==========================================================================
+       BADGES SYSTEM
+       ========================================================================== */
+    .m-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .m-badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .m-badge-open     { background: #EFF6FF; color: #1D4ED8; }  .m-badge-open .m-badge-dot     { background: #3B82F6; }
+    .m-badge-progress { background: #FFFBEB; color: #B45309; }  .m-badge-progress .m-badge-dot { background: #F59E0B; }
+    .m-badge-resolved { background: #ECFDF5; color: #047857; }  .m-badge-resolved .m-badge-dot { background: #10B981; }
+    .m-badge-danger   { background: #FEF2F2; color: #B91C1C; }  .m-badge-danger .m-badge-dot   { background: #EF4444; }
+
+    /* ==========================================================================
+       MODAL SYSTEM & ANIMATIONS
+       ========================================================================== */
+    .m-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      animation: fadeIn 0.15s ease forwards;
+    }
+    .m-modal {
+      background: var(--color-surface);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--color-border);
+      overflow: hidden;
+      animation: modalSlideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes modalSlideIn {
+      from { opacity: 0; transform: scale(0.96) translateY(8px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* ==========================================================================
+       TOP NAVBAR & DROPDOWNS (COLOR ACCENTS)
+       ========================================================================== */
+    .m-navbar {
+      width: 100%;
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      height: 64px;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      gap: 20px;
+    }
+    .m-nav-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 64px;
+      padding: 0 14px;
+      color: var(--color-text-secondary);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      position: relative;
+      transition: color 0.15s ease;
+    }
+    .m-nav-item:hover, .m-nav-item.active {
+      color: var(--color-accent);
+    }
+    .m-nav-item.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--color-accent);
+      border-radius: 3px 3px 0 0;
+    }
+
+    .m-nav-group {
+      position: relative;
+      height: 64px;
+      display: flex;
+      align-items: center;
+    }
+    .m-dropdown {
+      position: absolute;
+      top: 60px;
+      left: 0;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      min-width: 230px;
+      padding: 6px;
+      display: none;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .m-nav-group:hover .m-dropdown,
+    .m-dropdown.show {
+      display: flex !important;
+      z-index: 60;
+    }
+    .m-dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      color: var(--color-text-secondary);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.12s ease;
+    }
+    .m-dropdown-item:hover, .m-dropdown-item.active {
+      background: var(--color-accent-bg);
+      color: var(--color-accent);
+    }
+
+    /* ==========================================================================
+       DARK MODE THEME — toggle class 'dark' on <html>
+       ========================================================================== */
+    html.dark {
+      --color-bg:             #0F172A;
+      --color-surface:        #1E293B;
+      --color-border:         #334155;
+      --color-border-soft:    #263348;
+      --color-text-primary:   #F1F5F9;
+      --color-text-secondary: #94A3B8;
+      --color-text-tertiary:  #475569;
+
+      --color-accent:         #3B82F6;
+      --color-accent-hover:   #60A5FA;
+      --color-accent-bg:      #172554;
+
+      --color-danger:         #F87171;
+      --color-danger-bg:      #3B0A0A;
+      --color-warning:        #FCD34D;
+      --color-warning-bg:     #3B1F06;
+      --color-success:        #34D399;
+      --color-success-bg:     #022C22;
+
+      --shadow-sm:            0 2px 6px rgba(0, 0, 0, 0.3);
+      --shadow-md:            0 8px 20px rgba(0, 0, 0, 0.4);
+      --shadow-lg:            0 12px 32px rgba(0, 0, 0, 0.5);
+
+      color-scheme: dark;
+    }
+
+    /* Dark: smooth transition on theme switch */
+    body, .m-navbar, .m-card, .m-modal, .m-dropdown, #mobile-drawer {
+      transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+
+    /* Dark: Table overrides (hardcoded #F8FAFC in CSS) */
+    html.dark .m-table thead th {
+      background: #1E293B !important;
+      color: #475569 !important;
+      border-bottom-color: #334155;
+    }
+    html.dark .m-table tbody tr { border-bottom-color: #263348; }
+    html.dark .m-table tbody tr:hover { background: #263348; }
+    html.dark .m-table tbody td { color: #94A3B8; }
+
+    /* Dark: Mobile Drawer */
+    html.dark #mobile-drawer { background: #1E293B; }
+    html.dark #mobile-drawer-header { background: #0F172A !important; border-color: #334155 !important; }
+
+    /* Dark: Ghost & text buttons */
+    html.dark .m-btn-ghost {
+      background: #263348;
+      color: #94A3B8;
+      border-color: #334155;
+    }
+    html.dark .m-btn-ghost:hover {
+      background: #334155;
+      color: #F1F5F9;
+      border-color: #475569;
+    }
+    html.dark .m-btn-dark { background: #F1F5F9; color: #0F172A; }
+    html.dark .m-btn-dark:hover { background: #E2E8F0; }
+
+    html.dark .m-btn-danger {
+      background: var(--color-danger-bg);
+      color: var(--color-danger);
+      border-color: #7F1D1D;
+    }
+    html.dark .m-btn-danger:hover {
+      background: #5B0F0F;
+      border-color: #991B1B;
+    }
+    html.dark .m-btn-ghost-danger {
+      background: #263348;
+      color: #94A3B8;
+      border-color: #334155;
+    }
+    html.dark .m-btn-ghost-danger:hover {
+      background: #3B0A0A;
+      color: #FCA5A5;
+      border-color: #7F1D1D;
+    }
+
+    /* Dark: Input */
+    html.dark .m-input {
+      background: #1E293B;
+      border-color: #334155;
+      color: #F1F5F9;
+    }
+    html.dark .m-input:focus { box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
+    html.dark .m-input::placeholder { color: #475569; }
+
+    /* Dark: Custom scrollbar */
+    html.dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; }
+    html.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+    /* Dark: Tailwind text overrides */
+    html.dark .text-slate-900 { color: #F1F5F9 !important; }
+    html.dark .text-slate-800 { color: #E2E8F0 !important; }
+    html.dark .text-slate-700 { color: #CBD5E1 !important; }
+    html.dark .text-slate-600 { color: #94A3B8 !important; }
+    html.dark .text-slate-500 { color: #64748B !important; }
+    html.dark .text-slate-400 { color: #475569 !important; }
+
+    /* Dark: Tailwind background overrides */
+    html.dark .bg-white  { background-color: #1E293B !important; }
+    html.dark .bg-slate-50 { background-color: #0F172A !important; }
+    html.dark .bg-slate-100 { background-color: #263348 !important; }
+    html.dark .border-slate-100 { border-color: #334155 !important; }
+    html.dark .border-slate-200 { border-color: #334155 !important; }
+    html.dark .hover\:bg-slate-50:hover  { background-color: #263348 !important; }
+    html.dark .hover\:bg-slate-100:hover { background-color: #334155 !important; }
+    html.dark .hover\:bg-slate-200:hover { background-color: #334155 !important; }
+    html.dark .hover\:bg-blue-50:hover   { background-color: #172554 !important; }
+    html.dark .hover\:text-blue-600:hover { color: #60A5FA !important; }
+
+    /* Dark: Category badge in table (px-2 bg-slate-100 text-slate-700) */
+    html.dark .m-table .bg-slate-100 { background-color: #334155 !important; color: #CBD5E1 !important; }
+
+    /* Dark: Badge colors remain vivid — only tweak backgrounds */
+    html.dark .m-badge-open     { background: #172554; color: #93C5FD; }
+    html.dark .m-badge-progress { background: #3B1F06; color: #FCD34D; }
+    html.dark .m-badge-resolved { background: #022C22; color: #6EE7B7; }
+    html.dark .m-badge-danger   { background: #3B0A0A; color: #FCA5A5; }
+
+    /* Dark: Quick Metric Filter Cards */
+    html.dark .m-stat-card {
+      background: #1E293B;
+      border-color: #334155;
+    }
+    html.dark .m-stat-card:hover {
+      border-color: #475569;
+      background: #263348;
+    }
+    html.dark .m-stat-card.active {
+      background: #172554;
+      border-color: #3B82F6;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+    }
+
+    /* Dark: Theme toggle button icon transition */
+    #theme-toggle-btn { transition: transform 0.3s ease; }
+    #theme-toggle-btn:hover { transform: rotate(20deg); }
+  </style>
+</head>
+
+<body class="antialiased min-h-screen flex flex-col custom-scrollbar overflow-x-hidden">
+
+  <!-- ========================================================================
+       TOP NAVBAR WITH COLOR-ACCENTED DROPDOWNS
+       ======================================================================== -->
+  <header class="m-navbar shadow-xs">
+    <div class="flex items-center gap-3">
+      <!-- Mobile Toggle -->
+      <button onclick="toggleMobileDrawer()" class="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 transition" title="เปิดเมนู">
+        <i class="fa-solid fa-bars text-sm"></i>
+      </button>
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-sm shadow-blue-500/30">
+          <i class="fa-solid fa-layer-group text-sm"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-sm font-extrabold text-slate-900 tracking-tight leading-none">Enterprise App</h1>
+            <span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">v2.0</span>
+          </div>
+          <p class="text-[10px] text-slate-400 font-medium">Modern UI Template</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Desktop Navigation Items -->
+    <nav class="hidden lg:flex items-center h-full flex-1 gap-1 ml-4">
+      <div class="m-nav-item active" onclick="switchNavTab('dashboard')">
+        <i class="fa-solid fa-chart-pie"></i> ภาพรวม
+      </div>
+      
+      <!-- Group 1: Operations (Helpdesk) -->
+      <div class="m-nav-group">
+        <div class="m-nav-item">
+          <i class="fa-solid fa-headset"></i> งานบริการ <i class="fa-solid fa-chevron-down ml-1 text-[10px]"></i>
+        </div>
+        <div class="m-dropdown">
+          <div class="m-dropdown-item" onclick="switchNavTab('tickets')">
+            <i class="fa-solid fa-ticket w-4 text-blue-500"></i> แจ้งซ่อม (Tickets)
+          </div>
+          <div class="m-dropdown-item" onclick="switchNavTab('projects')">
+            <i class="fa-solid fa-diagram-project w-4 text-amber-500"></i> โครงการ (Projects)
+          </div>
+          <div class="m-dropdown-item" onclick="switchNavTab('tasks')">
+            <i class="fa-solid fa-list-check w-4 text-indigo-500"></i> งานส่วนตัว (Tasks)
+          </div>
+        </div>
+      </div>
+
+      <!-- Group 2: Inventory -->
+      <div class="m-nav-group">
+        <div class="m-nav-item">
+          <i class="fa-solid fa-laptop-code"></i> คลังอุปกรณ์ <i class="fa-solid fa-chevron-down ml-1 text-[10px]"></i>
+        </div>
+        <div class="m-dropdown">
+          <div class="m-dropdown-item" onclick="switchNavTab('assets')">
+            <i class="fa-solid fa-boxes-stacked w-4 text-emerald-500"></i> ทรัพย์สิน (Assets)
+          </div>
+          <div class="m-dropdown-item" onclick="switchNavTab('borrow')">
+            <i class="fa-solid fa-handshake w-4 text-teal-500"></i> ยืม-คืน (Borrow)
+          </div>
+          <div class="m-dropdown-item" onclick="switchNavTab('licenses')">
+            <i class="fa-solid fa-key w-4 text-purple-500"></i> ซอฟต์แวร์ (Licenses)
+          </div>
+        </div>
+      </div>
+
+      <!-- Group 3: Routines -->
+      <div class="m-nav-group">
+        <div class="m-nav-item">
+          <i class="fa-solid fa-screwdriver-wrench"></i> งานประจำวัน <i class="fa-solid fa-chevron-down ml-1 text-[10px]"></i>
+        </div>
+        <div class="m-dropdown">
+          <div class="m-dropdown-item" onclick="switchNavTab('pm')">
+            <i class="fa-solid fa-clipboard-check w-4 text-orange-500"></i> แผนซ่อมบำรุง (PM)
+          </div>
+          <div class="m-dropdown-item" onclick="switchNavTab('cctv')">
+            <i class="fa-solid fa-video w-4 text-rose-500"></i> ตรวจสอบ CCTV
+          </div>
+          <div class="m-dropdown-item" onclick="switchNavTab('backup')">
+            <i class="fa-solid fa-database w-4 text-cyan-500"></i> Server Backup
+          </div>
+        </div>
+      </div>
+
+      <!-- Single Nav Item: Users -->
+      <div class="m-nav-item" onclick="switchNavTab('users')">
+        <i class="fa-solid fa-users text-sky-500"></i> ผู้ใช้งาน
+      </div>
+
+      <!-- Single Nav Item: Settings -->
+      <div class="m-nav-item" onclick="switchNavTab('settings')">
+        <i class="fa-solid fa-gear text-slate-500"></i> ตั้งค่า
+      </div>
+    </nav>
+
+    <!-- Top Right Action Controls -->
+    <div class="flex items-center gap-2.5 ml-auto">
+      <button onclick="showToast('กดปุ่มค้นหาด่วน (Ctrl+K)', 'info')" class="m-btn m-btn-ghost text-slate-600">
+        <i class="fa-solid fa-magnifying-glass text-xs"></i> 
+        <span class="hidden md:inline text-xs font-semibold">ค้นหา</span>
+        <span class="hidden lg:inline text-[10px] text-slate-400 font-mono ml-1">Ctrl+K</span>
+      </button>
+      <button onclick="demoConfirmReset()" title="ทดสอบ Modal ยืนยันคืนค่า" class="m-btn m-btn-ghost m-btn-icon text-slate-500">
+        <i class="fa-solid fa-rotate text-xs"></i>
+      </button>
+      <!-- Dark / Light Mode Toggle -->
+      <button id="theme-toggle-btn" onclick="toggleTheme()" title="เปลี่ยนธีม Dark/Light" class="m-btn m-btn-ghost m-btn-icon text-slate-500">
+        <i class="fa-solid fa-moon text-xs"></i>
+      </button>
+      <button onclick="openCreateModal()" class="m-btn m-btn-primary">
+        <i class="fa-solid fa-plus text-xs"></i> <span class="hidden sm:inline">เพิ่มข้อมูลใหม่</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       MOBILE DRAWER WITH MODULE ICONS
+       ======================================================================== -->
+  <div id="mobile-drawer-overlay" class="fixed inset-0 bg-slate-900/50 z-50 hidden transition-opacity" onclick="toggleMobileDrawer()"></div>
+  <div id="mobile-drawer" class="fixed top-0 left-0 bottom-0 w-72 bg-white z-[60] transform -translate-x-full transition-transform duration-300 ease-in-out shadow-2xl flex flex-col custom-scrollbar overflow-y-auto">
+    <div id="mobile-drawer-header" class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white"><i class="fa-solid fa-layer-group text-xs"></i></div>
+        <div>
+          <h2 class="text-xs font-bold text-slate-900">Enterprise App</h2>
+          <p class="text-[10px] text-slate-400">Mobile Navigation</p>
+        </div>
+      </div>
+      <button onclick="toggleMobileDrawer()" class="w-8 h-8 rounded-lg hover:bg-slate-200 text-slate-500 flex items-center justify-center"><i class="fa-solid fa-xmark text-sm"></i></button>
+    </div>
+    
+    <div class="p-3 space-y-1 text-xs">
+      <!-- [FIX #5] data-drawer-tab hooks for active state sync — synced to Desktop Nav -->
+
+      <!-- Dashboard -->
+      <div data-drawer-tab="dashboard" onclick="switchNavTab('dashboard'); toggleMobileDrawer();" class="flex items-center gap-3 p-3 rounded-xl font-bold text-slate-800 hover:bg-blue-50 hover:text-blue-600 cursor-pointer">
+        <i class="fa-solid fa-chart-pie text-blue-500 w-5"></i> ภาพรวม (Dashboard)
+      </div>
+
+      <!-- Section: งานบริการ -->
+      <div class="pt-3 pb-1 text-[10px] font-extrabold text-slate-400 uppercase tracking-wider px-3">งานบริการ</div>
+      <div data-drawer-tab="tickets" onclick="switchNavTab('tickets'); toggleMobileDrawer();" class="flex items-center gap-3 p-2.5 rounded-xl font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 cursor-pointer">
+        <i class="fa-solid fa-ticket text-blue-500 w-5"></i> แจ้งซ่อม (Tickets)
+      </div>
+      <div data-drawer-tab="projects" onclick="switchNavTab('projects'); toggleMobileDrawer();" class="flex items-center gap-3 p-2.5 rounded-xl font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 cursor-pointer">
+        <i class="fa-solid fa-diagram-project text-amber-500 w-5"></i> โครงการ (Projects)
+      </div>
+      <div data-drawer-tab="tasks" onclick="switchNavTab('tasks'); toggleMobileDrawer();" class="flex items-center gap-3 p-2.5 rounded-xl font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 cursor-pointer">
+        <i class="fa-solid fa-list-check text-indigo-500 w-5"></i> งานส่วนตัว (Tasks)
+      </div>
+
+      <!-- Section: คลังอุปกรณ์ -->
+      <div class="pt-3 pb-1 text-[10px] font-extrabold text-slate-400 uppercase tracking-wider px-3">คลังอุปกรณ์</div>
+      <div data-drawer-tab="assets" onclick="switchNavTab('assets'); toggleMobileDrawer();" class="flex items-center gap-3 p-2.5 rounded-xl font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 cursor-pointer">
+        <i class="fa-solid fa-boxes-stacked text-emerald-500 w-5"></i> ทรัพย์สิน (Assets)
+      </div>
+      <div data-drawer-tab="borrow" onclick="switchNavTab('borrow'); toggleMobileDrawer();" class="flex items-center gap-3 p-2.5 rounded-xl font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 cursor-pointer">
+        <i class="fa-solid fa-handshake text-teal-500 w-5"></i> ยืม-คืน (Borrow)
+      </div>
+      <div data-drawer-tab="licenses" onclick="switchNavTab('licenses'); toggleMobileDrawer();" class="flex items-center gap-3 p-2.5 rounded-xl font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 cursor-pointer">
+        <i class="fa-solid fa-key text-purple-500 w-5"></i> ซอฟต์แวร์ (Licenses)
+      </div>
+
+      <!-- Section: งานประจำวัน -->
+      <div class="pt-3 pb-1 text-[10px] font-extrabold text-slate-400 uppercase tracking-wider px-3">งานประจำวัน</div>
+      <div data-drawer-tab="pm" onclick="switchNavTab('pm'); toggleMobileDrawer();" class="flex items-center gap-3 p-2.5 rounded-xl font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 cursor-pointer">
+        <i class="fa-solid fa-clipboard-check text-orange-500 w-5"></i> แผนซ่อมบำรุง (PM)
+      </div>
+      <div data-drawer-tab="cctv" onclick="switchNavTab('cctv'); toggleMobileDrawer();" class="flex items-center gap-3 p-2.5 rounded-xl font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 cursor-pointer">
+        <i class="fa-solid fa-video text-rose-500 w-5"></i> ตรวจสอบ CCTV
+      </div>
+      <div data-drawer-tab="backup" onclick="switchNavTab('backup'); toggleMobileDrawer();" class="flex items-center gap-3 p-2.5 rounded-xl font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 cursor-pointer">
+        <i class="fa-solid fa-database text-cyan-500 w-5"></i> Server Backup
+      </div>
+
+      <!-- Divider -->
+      <div class="mt-3 border-t border-slate-100"></div>
+
+      <!-- Standalone: Users & Settings -->
+      <div data-drawer-tab="users" onclick="switchNavTab('users'); toggleMobileDrawer();" class="flex items-center gap-3 p-2.5 rounded-xl font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 cursor-pointer">
+        <i class="fa-solid fa-users text-sky-500 w-5"></i> ผู้ใช้งาน
+      </div>
+      <div data-drawer-tab="settings" onclick="switchNavTab('settings'); toggleMobileDrawer();" class="flex items-center gap-3 p-2.5 rounded-xl font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-600 cursor-pointer">
+        <i class="fa-solid fa-gear text-slate-500 w-5"></i> ตั้งค่า
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MAIN CONTENT CONTAINER
+       ======================================================================== -->
+  <main class="p-4 md:p-8 space-y-6 flex-1 w-full max-w-[1400px] mx-auto">
+    
+    <!-- Header Section with CRUD Create Button -->
+    <div class="m-card p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
+          <h2 class="text-lg font-bold text-slate-900">จัดการข้อมูลรายการ (CRUD Management)</h2>
+        </div>
+        <p class="text-xs text-slate-500 mt-1">ตัวอย่างตารางแสดงผล พร้อมระบบ Interactive Card Filter, ค้นหา, คัดกรองหลายมิติ และ Custom Confirm Modal</p>
+      </div>
+
+      <!-- Header CTA Buttons -->
+      <div class="flex items-center gap-2">
+        <button onclick="demoShowToast('info')" class="m-btn m-btn-ghost">
+          <i class="fa-solid fa-bell text-xs"></i> Toast Demo
+        </button>
+        <button onclick="openCreateModal()" class="m-btn m-btn-primary">
+          <i class="fa-solid fa-plus text-xs"></i> เพิ่มรายการใหม่
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick Metric / KPI Filter Cards Grid -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- Card 1: ทั้งหมด (All) -->
+      <div id="filter-card-all" onclick="setQuickFilter('ALL', this)" class="m-stat-card active" title="คลิกเพื่อดูกระบวนงานทั้งหมด">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">ทั้งหมด (All)</span>
+          <div class="stat-icon-box bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+            <i class="fa-solid fa-layer-group"></i>
+          </div>
+        </div>
+        <div class="flex items-baseline gap-2 mt-2">
+          <h3 id="stat-count-all" class="text-2xl font-extrabold text-slate-900 leading-none">0</h3>
+          <span class="text-[10px] text-slate-400 font-medium">รายการ</span>
+        </div>
+        <p class="text-[10px] text-slate-400 mt-1 flex items-center gap-1">
+          <i class="fa-solid fa-filter text-[9px]"></i> แสดงข้อมูลทั้งหมด
+        </p>
+      </div>
+
+      <!-- Card 2: รอดำเนินการ (Open) -->
+      <div id="filter-card-open" onclick="setQuickFilter('Open', this)" class="m-stat-card" title="คลิกเพื่อกรองเฉพาะรายการรอดำเนินการ">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">รอดำเนินการ</span>
+          <div class="stat-icon-box bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400">
+            <i class="fa-solid fa-circle-dot"></i>
+          </div>
+        </div>
+        <div class="flex items-baseline gap-2 mt-2">
+          <h3 id="stat-count-open" class="text-2xl font-extrabold text-blue-600 dark:text-blue-400 leading-none">0</h3>
+          <span class="text-[10px] text-slate-400 font-medium">Open</span>
+        </div>
+        <p class="text-[10px] text-slate-400 mt-1 flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> รอมอบหมาย/เริ่มงาน
+        </p>
+      </div>
+
+      <!-- Card 3: กำลังดำเนินการ (In Progress) -->
+      <div id="filter-card-progress" onclick="setQuickFilter('In Progress', this)" class="m-stat-card" title="คลิกเพื่อกรองเฉพาะรายการที่กำลังแก้ไข">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">กำลังดำเนินการ</span>
+          <div class="stat-icon-box bg-amber-50 text-amber-600 dark:bg-amber-950 dark:text-amber-400">
+            <i class="fa-solid fa-clock"></i>
+          </div>
+        </div>
+        <div class="flex items-baseline gap-2 mt-2">
+          <h3 id="stat-count-progress" class="text-2xl font-extrabold text-amber-600 dark:text-amber-400 leading-none">0</h3>
+          <span class="text-[10px] text-slate-400 font-medium">In Progress</span>
+        </div>
+        <p class="text-[10px] text-slate-400 mt-1 flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> กำลังแก้ไขปัญหา
+        </p>
+      </div>
+
+      <!-- Card 4: แก้ไขแล้ว (Resolved) -->
+      <div id="filter-card-resolved" onclick="setQuickFilter('Resolved', this)" class="m-stat-card" title="คลิกเพื่อกรองเฉพาะรายการที่แก้ไขเรียบร้อยแล้ว">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">แก้ไขแล้ว</span>
+          <div class="stat-icon-box bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400">
+            <i class="fa-solid fa-circle-check"></i>
+          </div>
+        </div>
+        <div class="flex items-baseline gap-2 mt-2">
+          <h3 id="stat-count-resolved" class="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 leading-none">0</h3>
+          <span class="text-[10px] text-slate-400 font-medium">Resolved</span>
+        </div>
+        <p class="text-[10px] text-slate-400 mt-1 flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> เสร็จสิ้นสมบูรณ์
+        </p>
+      </div>
+    </div>
+
+    <!-- Data Table Card with Multi-Filter Toolbar -->
+    <div class="m-card overflow-hidden">
+      <!-- Multi-Filter Bar -->
+      <div class="p-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3 bg-white">
+        <div class="flex flex-wrap items-center gap-2.5 flex-1 min-w-[280px]">
+          <!-- Text Search -->
+          <div class="relative w-full sm:w-64">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-slate-400"></i>
+            <input type="text" id="table-search" oninput="renderTable()" placeholder="ค้นหาตามชื่อ, รหัส, ผู้รับผิดชอบ..." class="m-input pl-8">
+          </div>
+
+          <!-- Category Filter Dropdown -->
+          <div class="w-full sm:w-44">
+            <select id="filter-category" onchange="handleCategoryFilter(this.value)" class="m-input text-xs">
+              <option value="ALL">ทุกหมวดหมู่ (All)</option>
+              <option value="Hardware">Hardware</option>
+              <option value="Software">Software</option>
+              <option value="Network">Network</option>
+              <option value="Security">Security</option>
+            </select>
+          </div>
+
+          <!-- Status Dropdown (Synced with Cards) -->
+          <div class="w-full sm:w-44">
+            <select id="filter-status" onchange="handleStatusSelect(this.value)" class="m-input text-xs">
+              <option value="ALL">ทุกสถานะ (All Status)</option>
+              <option value="Open">Open (รอดำเนินการ)</option>
+              <option value="In Progress">In Progress (กำลังทำ)</option>
+              <option value="Resolved">Resolved (แก้ไขแล้ว)</option>
+            </select>
+          </div>
+
+          <!-- Reset Filter Button -->
+          <button id="btn-reset-filters" onclick="resetFilters()" class="m-btn m-btn-ghost text-slate-500 hover:text-slate-800" title="ล้างตัวกรองทั้งหมด">
+            <i class="fa-solid fa-rotate-left text-xs"></i> <span class="hidden sm:inline">ล้างตัวกรอง</span>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-slate-400 font-medium">แสดงผล <b id="total-count" class="text-slate-800">0</b> รายการ</span>
+        </div>
+      </div>
+
+      <!-- Responsive Table -->
+      <div class="overflow-x-auto">
+        <table class="m-table">
+          <thead>
+            <tr>
+              <th style="width: 120px;">รหัสรายการ</th>
+              <th>ชื่อรายการ / หัวข้อ</th>
+              <th>หมวดหมู่</th>
+              <th>ผู้รับผิดชอบ</th>
+              <th>สถานะ</th>
+              <th class="text-right" style="width: 140px;">จัดการ (Actions)</th>
+            </tr>
+          </thead>
+          <tbody id="demo-table-body">
+            <!-- Rendered by JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ========================================================================
+       CUSTOM CONFIRM MODAL (#modal-confirm)
+       ======================================================================== -->
+  <div id="modal-confirm" class="m-modal-overlay hidden" style="z-index: 70;">
+    <div class="m-modal w-full max-w-sm p-6 text-center space-y-4">
+      <!-- Icon Box (Dynamic Color) -->
+      <div id="confirm-icon-bg" class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center text-xl mx-auto">
+        <i id="confirm-icon" class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      
+      <!-- Text Content -->
+      <div>
+        <h3 id="confirm-title" class="font-bold text-base text-slate-900">ยืนยันการทำรายการ</h3>
+        <p id="confirm-message" class="text-xs text-slate-500 mt-1 leading-relaxed">คุณต้องการยืนยันการดำเนินการนี้หรือไม่?</p>
+      </div>
+      
+      <!-- Action Buttons -->
+      <div class="flex gap-2 pt-2">
+        <button type="button" onclick="closeConfirmModal(false)" class="m-btn m-btn-ghost flex-1">ยกเลิก</button>
+        <button type="button" id="confirm-ok-btn" onclick="closeConfirmModal(true)" class="m-btn m-btn-primary flex-1">ยืนยัน</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       FORM MODAL (CREATE / EDIT)
+       ======================================================================== -->
+  <div id="modal-form" class="m-modal-overlay hidden" style="z-index: 50;">
+    <div class="m-modal w-full max-w-md p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 id="form-modal-title" class="font-bold text-base text-slate-900">เพิ่มรายการใหม่</h3>
+        <button onclick="closeModal('modal-form')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-sm"></i></button>
+      </div>
+
+      <form id="item-form" onsubmit="handleFormSubmit(event)" class="space-y-3">
+        <input type="hidden" id="item-id">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">ชื่อรายการ / หัวข้อ <span class="text-rose-500">*</span></label>
+          <input type="text" id="item-title" required placeholder="ระบุชื่อรายการ" class="m-input">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">หมวดหมู่</label>
+            <select id="item-category" class="m-input">
+              <option value="Hardware">Hardware</option>
+              <option value="Software">Software</option>
+              <option value="Network">Network</option>
+              <option value="Security">Security</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">สถานะ</label>
+            <select id="item-status" class="m-input">
+              <option value="Open">Open</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Resolved">Resolved</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">ผู้รับผิดชอบ</label>
+          <input type="text" id="item-assignee" placeholder="ชื่อผู้รับผิดชอบ" class="m-input">
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closeModal('modal-form')" class="m-btn m-btn-ghost">ยกเลิก</button>
+          <button type="submit" class="m-btn m-btn-primary"><i class="fa-solid fa-floppy-disk text-xs"></i> บันทึกข้อมูล</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       TOAST NOTIFICATION CONTAINER
+       ======================================================================== -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-[80] flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- ========================================================================
+       JAVASCRIPT LOGIC & API
+       ======================================================================== -->
+  <script>
+    // --------------------------------------------------------------------------
+    // 0. UTILITY FUNCTIONS
+    // --------------------------------------------------------------------------
+
+    /**
+     * [FIX #1] Escape HTML entities to prevent XSS when inserting user data into innerHTML
+     */
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // --------------------------------------------------------------------------
+    // 1. SAMPLE STATE DATA
+    // --------------------------------------------------------------------------
+    let sampleData = [
+      { id: 'REC-001', title: 'อัปเกรดระบบ Core Switch 10G', category: 'Network', assignee: 'สมชาย ผู้ดูแลระบบ', status: 'In Progress' },
+      { id: 'REC-002', title: 'ติดตั้ง License Office 365 ฝ่ายการเงิน', category: 'Software', assignee: 'อนันต์ ช่างเทคนิค', status: 'Resolved' },
+      { id: 'REC-003', title: 'ตรวจสอบระบบกล้อง CCTV ประจำสัปดาห์', category: 'Security', assignee: 'วิชัย ทีมซัพพอร์ต', status: 'Open' },
+      { id: 'REC-004', title: 'จัดซื้อเครื่องคอมพิวเตอร์ Laptop ให้พนักงานใหม่', category: 'Hardware', assignee: 'สมชาย ผู้ดูแลระบบ', status: 'Open' }
+    ];
+
+    // [FIX #2] Auto-increment counter — prevents duplicate IDs after delete
+    let _idCounter = 4;
+
+    // --------------------------------------------------------------------------
+    // 2. CUSTOM CONFIRM MODAL SYSTEM (REPLACES NATIVE CONFIRM)
+    // --------------------------------------------------------------------------
+    let confirmCallback = null;
+
+    /**
+     * เรียกเปิด Custom Confirm Modal
+     * @param {string} title - หัวข้อแจ้งเตือน
+     * @param {string} message - ข้อความอธิบาย
+     * @param {function} onConfirm - ฟังก์ชันที่จะทำงานเมื่อกดยืนยัน
+     * @param {boolean} isDanger - ถ้า true จะแสดงธีมสีแดง (สำหรับลบข้อมูล)
+     */
+    function showConfirm(title, message, onConfirm, isDanger = false) {
+      document.getElementById('confirm-title').innerText = title;
+      document.getElementById('confirm-message').innerText = message;
+      confirmCallback = onConfirm;
+
+      const okBtn = document.getElementById('confirm-ok-btn');
+      const iconBg = document.getElementById('confirm-icon-bg');
+      const icon = document.getElementById('confirm-icon');
+
+      if (isDanger) {
+        okBtn.className = 'm-btn m-btn-danger flex-1';
+        iconBg.className = 'w-12 h-12 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center text-xl mx-auto';
+        icon.className = 'fa-solid fa-trash';
+      } else {
+        okBtn.className = 'm-btn m-btn-primary flex-1';
+        iconBg.className = 'w-12 h-12 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center text-xl mx-auto';
+        icon.className = 'fa-solid fa-triangle-exclamation';
+      }
+
+      document.getElementById('modal-confirm').classList.remove('hidden');
+    }
+
+    function closeConfirmModal(result) {
+      document.getElementById('modal-confirm').classList.add('hidden');
+      if (result && typeof confirmCallback === 'function') {
+        confirmCallback();
+      }
+      confirmCallback = null;
+    }
+
+    // --------------------------------------------------------------------------
+    // 3. TOAST NOTIFICATION UTILITY
+    // --------------------------------------------------------------------------
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+
+      const toast = document.createElement('div');
+      const borderColors = {
+        success: '#10B981',
+        info:    '#2563EB',
+        error:   '#EF4444',
+        warning: '#F59E0B'
+      };
+      const iconClasses = {
+        success: 'fa-solid fa-circle-check text-emerald-500',
+        info:    'fa-solid fa-circle-info text-blue-500',
+        error:   'fa-solid fa-circle-xmark text-rose-500',
+        warning: 'fa-solid fa-triangle-exclamation text-amber-500'
+      };
+
+      toast.className = "pointer-events-auto bg-white p-3.5 rounded-xl shadow-lg border-l-4 font-medium text-xs text-slate-800 flex items-center gap-2 min-w-[260px] border border-slate-100 transition transform duration-200 ease-out";
+      toast.style.borderLeftColor = borderColors[type] || '#2563EB';
+      // [FIX #4] Use safe DOM construction instead of innerHTML to prevent XSS
+      const icon = document.createElement('i');
+      icon.className = iconClasses[type] || iconClasses.info;
+      const span = document.createElement('span');
+      span.textContent = message; // Safe: textContent never executes scripts
+      toast.appendChild(icon);
+      toast.appendChild(document.createTextNode(' '));
+      toast.appendChild(span);
+
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        setTimeout(() => toast.remove(), 200);
+      }, 3000);
+    }
+
+    // --------------------------------------------------------------------------
+    // 4. FILTER STATE & QUICK METRIC CARDS LOGIC
+    // --------------------------------------------------------------------------
+    let _currentStatusFilter = 'ALL';
+    let _currentCategoryFilter = 'ALL';
+
+    /**
+     * กรองข้อมูลด่วนเมื่อคลิกที่ Quick Metric Filter Card
+     * @param {string} status - 'ALL', 'Open', 'In Progress', 'Resolved'
+     * @param {HTMLElement} cardEl - Element ของการ์ดที่ถูกคลิก
+     */
+    function setQuickFilter(status, cardEl) {
+      _currentStatusFilter = status;
+
+      // สลับ Active class บนการ์ด
+      document.querySelectorAll('.m-stat-card').forEach(c => c.classList.remove('active'));
+      if (cardEl) {
+        cardEl.classList.add('active');
+      } else {
+        const idMap = {
+          'ALL': 'filter-card-all',
+          'Open': 'filter-card-open',
+          'In Progress': 'filter-card-progress',
+          'Resolved': 'filter-card-resolved'
+        };
+        if (idMap[status]) {
+          document.getElementById(idMap[status])?.classList.add('active');
+        }
+      }
+
+      // Sync ค่ากับ Dropdown สถานะ
+      const statusSelect = document.getElementById('filter-status');
+      if (statusSelect) statusSelect.value = status;
+
+      renderTable();
+    }
+
+    /**
+     * กรองข้อมูลเมื่อเปลี่ยนค่าใน Status Dropdown
+     */
+    function handleStatusSelect(status) {
+      _currentStatusFilter = status;
+      setQuickFilter(status, null);
+    }
+
+    /**
+     * กรองข้อมูลเมื่อเปลี่ยนค่าใน Category Dropdown
+     */
+    function handleCategoryFilter(category) {
+      _currentCategoryFilter = category;
+      renderTable();
+    }
+
+    /**
+     * ล้างตัวกรองและคำค้นหาทั้งหมดกลับสู่ค่าเริ่มต้น
+     */
+    function resetFilters() {
+      _currentStatusFilter = 'ALL';
+      _currentCategoryFilter = 'ALL';
+
+      const searchInput = document.getElementById('table-search');
+      if (searchInput) searchInput.value = '';
+
+      const catSelect = document.getElementById('filter-category');
+      if (catSelect) catSelect.value = 'ALL';
+
+      const statusSelect = document.getElementById('filter-status');
+      if (statusSelect) statusSelect.value = 'ALL';
+
+      document.querySelectorAll('.m-stat-card').forEach(c => c.classList.remove('active'));
+      document.getElementById('filter-card-all')?.classList.add('active');
+
+      renderTable();
+      showToast('ล้างตัวกรองทั้งหมดเรียบร้อยแล้ว', 'info');
+    }
+
+    /**
+     * อัปเดตตัวเลขจำนวนสถิติบน Quick Metric Cards แบบไดนามิกตาม sampleData
+     */
+    function updateMetricCounts() {
+      const total = sampleData.length;
+      const openCount = sampleData.filter(d => d.status === 'Open').length;
+      const progressCount = sampleData.filter(d => d.status === 'In Progress').length;
+      const resolvedCount = sampleData.filter(d => d.status === 'Resolved').length;
+
+      const elAll = document.getElementById('stat-count-all');
+      const elOpen = document.getElementById('stat-count-open');
+      const elProgress = document.getElementById('stat-count-progress');
+      const elResolved = document.getElementById('stat-count-resolved');
+
+      if (elAll) elAll.innerText = total;
+      if (elOpen) elOpen.innerText = openCount;
+      if (elProgress) elProgress.innerText = progressCount;
+      if (elResolved) elResolved.innerText = resolvedCount;
+    }
+
+    // --------------------------------------------------------------------------
+    // 5. CRUD OPERATIONS DEMO & TABLE RENDERING
+    // --------------------------------------------------------------------------
+    function renderTable() {
+      updateMetricCounts();
+
+      const tbody = document.getElementById('demo-table-body');
+      const searchKeyword = (document.getElementById('table-search')?.value || '').toLowerCase().trim();
+
+      const filtered = sampleData.filter(item => {
+        // กรองตามสถานะ
+        const matchStatus = (_currentStatusFilter === 'ALL') || (item.status === _currentStatusFilter);
+
+        // กรองตามหมวดหมู่
+        const matchCategory = (_currentCategoryFilter === 'ALL') || (item.category === _currentCategoryFilter);
+
+        // ค้นหาตามคำสำคัญ
+        const matchSearch = !searchKeyword || (
+          item.id.toLowerCase().includes(searchKeyword) ||
+          item.title.toLowerCase().includes(searchKeyword) ||
+          item.assignee.toLowerCase().includes(searchKeyword) ||
+          item.category.toLowerCase().includes(searchKeyword)
+        );
+
+        return matchStatus && matchCategory && matchSearch;
+      });
+
+      document.getElementById('total-count').innerText = filtered.length;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="p-8 text-center text-slate-400">
+              <div class="flex flex-col items-center justify-center gap-2">
+                <i class="fa-solid fa-filter-circle-xmark text-2xl text-slate-300"></i>
+                <span class="text-xs">ไม่พบรายการข้อมูลที่ตรงกับเงื่อนไขการค้นหาหรือตัวกรอง</span>
+                <button onclick="resetFilters()" class="m-btn m-btn-ghost mt-1 text-xs">
+                  <i class="fa-solid fa-rotate-left text-xs"></i> ล้างตัวกรอง
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(item => {
+        let badgeClass = 'm-badge-open';
+        if (item.status === 'In Progress') badgeClass = 'm-badge-progress';
+        if (item.status === 'Resolved') badgeClass = 'm-badge-resolved';
+
+        // [FIX #1] All user-data fields wrapped with escapeHtml() to prevent XSS
+        const safeId       = escapeHtml(item.id);
+        const safeTitle    = escapeHtml(item.title);
+        const safeCategory = escapeHtml(item.category);
+        const safeAssignee = escapeHtml(item.assignee);
+        const safeStatus   = escapeHtml(item.status);
+
+        return `
+          <tr class="hover:bg-slate-50 border-b border-slate-100 transition">
+            <td class="p-3 font-mono font-bold text-slate-700">${safeId}</td>
+            <td class="p-3">
+              <div class="font-bold text-slate-800 hover:text-blue-600 cursor-pointer" onclick="openEditModal('${safeId}')">${safeTitle}</div>
+            </td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[11px] font-semibold">${safeCategory}</span></td>
+            <td class="p-3 text-slate-600 font-medium">${safeAssignee}</td>
+            <td class="p-3">
+              <span class="m-badge ${badgeClass}"><span class="m-badge-dot"></span>${safeStatus}</span>
+            </td>
+            <td class="p-3 text-right space-x-1 whitespace-nowrap">
+              <!-- View / Edit Action -->
+              <button onclick="openEditModal('${safeId}')" title="แก้ไขรายการ: ${safeTitle}" aria-label="แก้ไขรายการ ${safeTitle}" class="m-btn m-btn-ghost m-btn-icon">
+                <i class="fa-solid fa-pen-to-square text-slate-600"></i>
+              </button>
+              <!-- Delete Action with Custom Confirm Modal (Ghost-to-Danger Hover Pattern) -->
+              <button onclick="deleteItem('${safeId}')" title="ลบรายการ: ${safeTitle}" aria-label="ลบรายการ ${safeTitle}" class="m-btn m-btn-ghost-danger m-btn-icon">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function openCreateModal() {
+      document.getElementById('form-modal-title').innerText = 'เพิ่มรายการใหม่';
+      document.getElementById('item-id').value = '';
+      document.getElementById('item-title').value = '';
+      document.getElementById('item-category').value = 'Hardware';
+      document.getElementById('item-status').value = 'Open';
+      document.getElementById('item-assignee').value = '';
+      document.getElementById('modal-form').classList.remove('hidden');
+      // [FIX #3] Focus first input field on modal open for keyboard accessibility
+      setTimeout(() => document.getElementById('item-title').focus(), 80);
+    }
+
+    function openEditModal(id) {
+      const item = sampleData.find(d => d.id === id);
+      if (!item) return;
+
+      document.getElementById('form-modal-title').innerText = `แก้ไขรายการ: ${escapeHtml(item.id)}`;
+      document.getElementById('item-id').value = item.id;
+      document.getElementById('item-title').value = item.title;
+      document.getElementById('item-category').value = item.category;
+      document.getElementById('item-status').value = item.status;
+      document.getElementById('item-assignee').value = item.assignee;
+      document.getElementById('modal-form').classList.remove('hidden');
+      // [FIX #3] Focus first input field on edit modal open
+      setTimeout(() => document.getElementById('item-title').focus(), 80);
+    }
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('item-id').value;
+      const title = document.getElementById('item-title').value.trim();
+      const category = document.getElementById('item-category').value;
+      const status = document.getElementById('item-status').value;
+      const assignee = document.getElementById('item-assignee').value.trim() || 'ไม่ระบุ';
+
+      if (id) {
+        // Edit existing
+        const index = sampleData.findIndex(d => d.id === id);
+        if (index !== -1) {
+          sampleData[index] = { id, title, category, status, assignee };
+          showToast(`อัปเดตข้อมูล ${id} เรียบร้อยแล้ว`, 'success');
+        }
+      } else {
+        // Create new — [FIX #2] Use dedicated counter to prevent ID collision after delete
+        const newId = `REC-${String(++_idCounter).padStart(3, '0')}`;
+        sampleData.unshift({ id: newId, title, category, status, assignee });
+        showToast(`สร้างรายการใหม่ ${newId} สำเร็จ`, 'success');
+      }
+
+      closeModal('modal-form');
+      renderTable();
+    }
+
+    function deleteItem(id) {
+      const item = sampleData.find(d => d.id === id);
+      const name = item ? item.title : id;
+
+      // Call Custom Confirm Modal
+      showConfirm(
+        'ยืนยันการลบรายการ',
+        `คุณต้องการลบรายการ "${name}" (${id}) ออกจากระบบอย่างถาวรหรือไม่?`,
+        function() {
+          sampleData = sampleData.filter(d => d.id !== id);
+          renderTable();
+          showToast(`ลบรายการ ${id} เรียบร้อยแล้ว`, 'info');
+        },
+        true // isDanger = true (Red theme)
+      );
+    }
+
+    function demoConfirmReset() {
+      showConfirm(
+        'คืนค่าข้อมูลเริ่มต้น?',
+        'คุณต้องการรีเซ็ตข้อมูลตัวอย่างทั้งหมดกลับสู่ค่าเริ่มต้นของ Template หรือไม่?',
+        function() {
+          sampleData = [
+            { id: 'REC-001', title: 'อัปเกรดระบบ Core Switch 10G', category: 'Network', assignee: 'สมชาย ผู้ดูแลระบบ', status: 'In Progress' },
+            { id: 'REC-002', title: 'ติดตั้ง License Office 365 ฝ่ายการเงิน', category: 'Software', assignee: 'อนันต์ ช่างเทคนิค', status: 'Resolved' },
+            { id: 'REC-003', title: 'ตรวจสอบระบบกล้อง CCTV ประจำสัปดาห์', category: 'Security', assignee: 'วิชัย ทีมซัพพอร์ต', status: 'Open' }
+          ];
+          renderTable();
+          showToast('รีเซ็ตข้อมูลเรียบร้อยแล้ว', 'info');
+        },
+        false // isDanger = false (Amber warning theme)
+      );
+    }
+
+    function demoShowToast(type) {
+      showToast('การแจ้งเตือนแบบ Toast สวยงามทันสมัย!', type);
+    }
+
+    // --------------------------------------------------------------------------
+    // 5. MODAL UTILITY & NAVIGATION
+    // --------------------------------------------------------------------------
+    function closeModal(modalId) {
+      const el = document.getElementById(modalId);
+      if (el) el.classList.add('hidden');
+    }
+
+    function toggleMobileDrawer() {
+      const drawer = document.getElementById('mobile-drawer');
+      const overlay = document.getElementById('mobile-drawer-overlay');
+      if (drawer.classList.contains('-translate-x-full')) {
+        drawer.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+      } else {
+        drawer.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+      }
+    }
+
+    // [FIX #5] Track current active tab for Mobile Drawer active state
+    let _currentTab = 'dashboard';
+
+    function switchNavTab(tabName) {
+      _currentTab = tabName;
+      updateMobileDrawerActive();
+      showToast(`เปลี่ยนแท็บไปที่: ${tabName}`, 'info');
+    }
+
+    /**
+     * [FIX #5] Update active highlight in Mobile Drawer to match current tab
+     */
+    function updateMobileDrawerActive() {
+      document.querySelectorAll('[data-drawer-tab]').forEach(el => {
+        const isActive = el.dataset.drawerTab === _currentTab;
+        el.classList.toggle('bg-blue-50', isActive);
+        el.classList.toggle('text-blue-600', isActive);
+        el.classList.toggle('font-bold', isActive);
+        el.classList.toggle('font-medium', !isActive);
+        el.classList.toggle('text-slate-700', !isActive);
+      });
+    }
+
+    // --------------------------------------------------------------------------
+    // 6. DARK / LIGHT THEME TOGGLE
+    // --------------------------------------------------------------------------
+
+    /**
+     * Toggle between dark and light mode.
+     * Persists preference to localStorage. Falls back to OS preference.
+     */
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      _applyThemeButton(isDark);
+    }
+
+    function _applyThemeButton(isDark) {
+      const btn = document.getElementById('theme-toggle-btn');
+      if (!btn) return;
+      btn.innerHTML = isDark
+        ? '<i class="fa-solid fa-sun text-xs text-amber-400"></i>'
+        : '<i class="fa-solid fa-moon text-xs"></i>';
+      btn.title = isDark ? 'เปลี่ยนเป็น Light Mode' : 'เปลี่ยนเป็น Dark Mode';
+    }
+
+    function _initTheme() {
+      // Priority: localStorage → OS prefers-color-scheme → default light
+      const saved = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const isDark = saved ? (saved === 'dark') : prefersDark;
+      if (isDark) document.documentElement.classList.add('dark');
+      _applyThemeButton(isDark);
+    }
+
+    // --------------------------------------------------------------------------
+    // 7. INITIALIZATION & KEYBOARD SHORTCUTS
+    // --------------------------------------------------------------------------
+    document.addEventListener('DOMContentLoaded', () => {
+      _initTheme();
+      renderTable();
+      updateMobileDrawerActive();
+
+      // Keyboard Esc to close all open modals
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          document.querySelectorAll('.m-modal-overlay:not(.hidden)').forEach(m => m.classList.add('hidden'));
+        }
+      });
+    });
+  </script>
+</body>
+</html>

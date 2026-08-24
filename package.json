@@ -1,0 +1,42 @@
+{
+    "scripts": {
+        "lint": "eslint . --max-warnings=0",
+        "type-check": "tsc --noEmit",
+        "build": "next build",
+        "test:unit": "jest tests/unit --coverage",
+        "test:int": "jest tests/integration",
+        "test:regression": "jest tests/regression",
+        "audit:sec": "npm audit --audit-level=high",
+        "migrate": "node-pg-migrate up",
+        "migrate:create": "node-pg-migrate create",
+        "seed": "ts-node scripts/seed.ts"
+    },
+    "dependencies": {
+        "bcrypt": "^6.0.0",
+        "dotenv": "^17.4.2",
+        "jsonwebtoken": "^9.0.3",
+        "next": "^16.3.2",
+        "node-pg-migrate": "^9.0.0",
+        "pg": "^8.23.0",
+        "react": "^19.2.8",
+        "react-dom": "^19.2.8",
+        "zod": "^4.4.3"
+    },
+    "devDependencies": {
+        "@types/bcrypt": "^6.0.0",
+        "@types/jest": "^30.0.0",
+        "@types/jsonwebtoken": "^9.0.10",
+        "@types/node": "^26.2.0",
+        "@types/pg": "^8.23.1",
+        "@types/react": "19.2.18",
+        "@types/uuid": "^10.0.0",
+        "@typescript-eslint/eslint-plugin": "^8.67.0",
+        "@typescript-eslint/parser": "^8.67.0",
+        "eslint": "^10.9.0",
+        "jest": "^30.4.2",
+        "ts-jest": "^29.4.12",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.5.4",
+        "uuid": "^14.0.2"
+    }
+}
