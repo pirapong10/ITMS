@@ -1,36 +1,35 @@
-# PHASE SPECIFICATION: PHASE-05A - Enterprise SSO (SAML/OIDC) & MFA
+# PHASE SPECIFICATION: PHASE-05B - SCIM 2.0 User Lifecycle Provisioning
 
 ---
 
 ## 1. Phase Metadata
-- **Phase ID:** `PHASE-05A`
-- **Parent Epic / Feature:** `Global Standards: Enterprise SSO (SAML/OIDC) & Multi-Factor Authentication`
+- **Phase ID:** `PHASE-05B`
+- **Parent Epic / Feature:** `Global Standards: SCIM 2.0 User Lifecycle Provisioning`
 - **Risk Level:** `HIGH`
-- **Estimated Scope:** `Medium (10-14 files)`
-- **Prerequisites / Dependencies:** `PHASE-01A`, `PHASE-01B`, `PHASE-02A`, `PHASE-02B`, `PHASE-02C`, `PHASE-03A`, `PHASE-03B`, `PHASE-04A`, `PHASE-04B`
+- **Estimated Scope:** `Medium (12-14 files)`
+- **Prerequisites / Dependencies:** `PHASE-01A`, `PHASE-01B`, `PHASE-02A`, `PHASE-02B`, `PHASE-02C`, `PHASE-03A`, `PHASE-03B`, `PHASE-04A`, `PHASE-04B`, `PHASE-05A`
 
 ---
 
 ## 2. Objective & Deliverables
 ### 2.1 Core Goal
-Implement Enterprise Single Sign-On (SSO) with Okta / Microsoft Entra ID / Google Workspace support, Just-In-Time (JIT) user auto-provisioning, and Multi-Factor Authentication (MFA) via RFC 6238 TOTP Authenticator and Backup Recovery Codes (FR-GL-04, FR-GL-06).
+Implement RFC 7643 / RFC 7644 compliant SCIM 2.0 Protocol Server for real-time user and group provisioning, attribute synchronization, and deprovisioning directly from Identity Providers such as Okta and Microsoft Entra ID (FR-GL-05).
 
 ### 2.2 Expected Deliverables
 - [ ] Database Migrations:
-  - `migrations/1787630000000_create_sso_and_mfa_tables.js` (Create `tenant_sso_configs`, `user_mfa_credentials` with RLS)
+  - `migrations/1787640000000_create_scim_tables.js` (Create `tenant_scim_tokens`, `groups`, `group_memberships`, add `is_active`, `external_id` to `users`)
 - [ ] New modules/files created:
-  - `src/lib/sso.ts` (Tenant SSO config, SAML/OIDC payload validation, JIT provisioning engine)
-  - `src/lib/mfa.ts` (RFC 6238 TOTP generator & validator, backup codes generator & redemption)
-  - `app/api/v1/sso/config/route.ts` (GET & POST SSO configuration)
-  - `app/api/v1/sso/callback/route.ts` (POST SSO login callback & JIT)
-  - `app/api/v1/mfa/setup/route.ts` (POST generate TOTP secret & QR code uri)
-  - `app/api/v1/mfa/verify/route.ts` (POST verify and enable MFA)
-  - `app/api/v1/mfa/challenge/route.ts` (POST exchange MFA challenge code for session JWT)
-  - `app/api/v1/mfa/disable/route.ts` (POST disable MFA)
+  - `src/lib/scim.ts` (SCIM 2.0 engine, token authentication, user/group resource serializer, filter parsing)
+  - `app/api/scim/v2/ServiceProviderConfig/route.ts` (GET SCIM metadata)
+  - `app/api/scim/v2/ResourceTypes/route.ts` (GET ResourceTypes)
+  - `app/api/scim/v2/Schemas/route.ts` (GET Schemas)
+  - `app/api/scim/v2/Users/route.ts` (GET & POST SCIM Users)
+  - `app/api/scim/v2/Users/[id]/route.ts` (GET, PUT, PATCH, DELETE SCIM User)
+  - `app/api/scim/v2/Groups/route.ts` (GET & POST SCIM Groups)
+  - `app/api/v1/scim/token/route.ts` (GET & POST Tenant SCIM Bearer Token generation)
 - [ ] Unit & integration test files:
-  - `tests/unit/sso.test.ts`
-  - `tests/unit/mfa.test.ts`
-  - `tests/integration/sso.test.ts`
+  - `tests/unit/scim.test.ts`
+  - `tests/integration/scim.test.ts`
 - [ ] Documentation updates: `PHASE_REPORT.md`
 
 ---
@@ -38,7 +37,7 @@ Implement Enterprise Single Sign-On (SSO) with Okta / Microsoft Entra ID / Googl
 ## 3. Phase Contract & Acceptance Criteria
 | ID | Requirement | Verification Method | Pass Criteria |
 |---|---|---|---|
-| `AC-05A-01` | Enterprise SSO Configuration | Integration Test | Configures SAML / OIDC provider metadata with encryption of client secrets and certificates. |
-| `AC-05A-02` | JIT User Auto-Provisioning | Integration Test | Automatically provisions a new user record upon first valid SSO login if JIT is enabled. |
-| `AC-05A-03` | RFC 6238 TOTP & Backup Codes | Unit Test | Generates and verifies 6-digit TOTP codes against time-step window; generates 10 single-use recovery codes. |
-| `AC-05A-04` | MFA Login Challenge Flow | Integration Test | Enforces MFA verification challenge before granting final authenticated session JWT. |
+| `AC-05B-01` | SCIM 2.0 Metadata Endpoints | Integration Test | Returns valid RFC 7643 `ServiceProviderConfig`, `ResourceTypes`, and `Schemas`. |
+| `AC-05B-02` | SCIM User Provisioning (CRUD) | Integration Test | Creates, reads, updates (PUT/PATCH), and deletes users via standard SCIM 2.0 payloads. |
+| `AC-05B-03` | Real-Time Deprovisioning | Integration Test | Handles PATCH `active: false` or DELETE to instantly deprovision/suspend user access. |
+| `AC-05B-04` | SCIM Bearer Token Auth | Integration Test | Authenticates IdP requests via tenant-scoped SCIM bearer token and enforces tenant isolation. |

@@ -3,7 +3,7 @@
 ## 1. Project Information
 - **Project Name:** IT Service Management System (ITSM Enterprise - SaaS Edition)
 - **Application Type:** Enterprise Helpdesk, B2B SaaS Platform & IT Operations Management System
-- **Current Phase:** Phase 05B: SCIM 2.0 User Lifecycle Provisioning
+- **Current Phase:** Phase 06A: Problem Management (RCA)
 - **Overall Status:** INITIALIZED
 - **Version:** v2.1.0 (Global Standards & Enterprise Compliance Enabled)
 
@@ -23,8 +23,8 @@
 | **04A** | **Internationalization (i18n) & Multi-Currency** | UI Translation Dictionary (JSON), Fallback Language Engine, Currency Exchange Rate API (FR-GL-01, FR-GL-02) | Medium | Medium | **COMPLETED** |
 | **04B** | **Multi-Timezone Engine** | UTC Storage, User/Tenant Timezone Conversion, Daylight Saving Time (DST) Handling (FR-GL-03) | High | High | **COMPLETED** |
 | **05A** | **Enterprise SSO (SAML/OIDC) & MFA** | Okta/Entra ID Integration, JIT Provisioning, TOTP, FIDO2/Passkey (FR-GL-04, FR-GL-06) | High | High | **COMPLETED** |
-| **05B** | **SCIM 2.0 User Lifecycle Provisioning** | Real-time User Provisioning/Deprovisioning via IdP (FR-GL-05) | Medium | High | **IN PROGRESS** |
-| **06A** | **Problem Management (RCA)** | Known Error Database (KEDB), Workarounds, Incident Clusters (FR-GL-10) | Medium | Medium | PENDING |
+| **05B** | **SCIM 2.0 User Lifecycle Provisioning** | Real-time User Provisioning/Deprovisioning via IdP (FR-GL-05) | Medium | High | **COMPLETED** |
+| **06A** | **Problem Management (RCA)** | Known Error Database (KEDB), Workarounds, Incident Clusters (FR-GL-10) | Medium | Medium | **IN PROGRESS** |
 | **06B** | **Change Enablement & CAB Workflow** | Multi-stage CAB Approval, Risk & Impact Analysis, Rollback Plans (FR-GL-11) | High | High | PENDING |
 | **06C** | **Knowledge Management (KCS)** | Self-Service KB, Resolution Notes to Draft Article conversion (FR-GL-12) | Low | Low | PENDING |
 | **07A** | **Immutable Logs & Data Privacy** | Append-Only Audit Logs (SOC 2), GDPR Data Subject Access Request (DSAR), Data Anonymization (FR-GL-07, FR-GL-09) | High | High | PENDING |

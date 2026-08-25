@@ -1,34 +1,31 @@
 # PHASE COMPLETION REPORT
 
-- **Phase ID:** `PHASE-05A`
-- **Phase Name:** `Enterprise SSO (SAML/OIDC) & MFA`
-- **Completion Timestamp:** `2026-08-25T08:35:18+07:00`
+- **Phase ID:** `PHASE-05B`
+- **Phase Name:** `SCIM 2.0 User Lifecycle Provisioning`
+- **Completion Timestamp:** `2026-08-25T08:37:25+07:00`
 - **Sign-Off Status:** `COMPLETED (Quality Gates 100% Passed)`
 
 ---
 
 ## 1. Executive Summary & Deliverables
-Implemented Enterprise Single Sign-On (SSO) engine supporting SAML, OIDC, Okta, Microsoft Entra ID, and Google Workspace with Just-In-Time (JIT) user auto-provisioning, plus Multi-Factor Authentication (MFA) using RFC 6238 Time-based One-Time Passwords (TOTP Authenticator apps) and single-use Backup Recovery Codes.
+Implemented RFC 7643 / RFC 7644 compliant SCIM 2.0 Identity Protocol Server for real-time user provisioning, attribute updating, group membership synchronisation, deprovisioning (`active: false`), and tenant-isolated SCIM Bearer token authentication from Identity Providers (Okta, Microsoft Entra ID).
 
 ### Core Modules Delivered:
-1. **Database Schema:** `migrations/1787630000000_create_sso_and_mfa_tables.js`
-   - Extended `tenant_sso_configs` table with provider metadata, encrypted client secrets, certificates, and JIT provisioning flags.
-   - Created `user_mfa_credentials` table with AES-256 encrypted TOTP secrets and JSON array of backup codes.
-   - Enabled Row-Level Security (RLS) policies for tenant data isolation.
-2. **Enterprise SSO Engine:** `src/lib/sso.ts`
-   - Tenant SSO configuration manager with encrypted storage.
-   - SSO callback processor with automatic JIT user provisioning and role assignment.
-3. **MFA & TOTP Engine:** `src/lib/mfa.ts`
-   - Base32 encoder/decoder and RFC 6238 TOTP computation (HMAC-SHA1, 30s step, 6-digit codes) with drift tolerance.
-   - Single-use 8-character backup codes generator and atomic redemption tracking.
-   - Multi-factor challenge exchange for JWT session tokens.
-4. **Next.js App Router Endpoints:**
-   - `GET /api/v1/sso/config` & `POST /api/v1/sso/config`
-   - `POST /api/v1/sso/callback`
-   - `POST /api/v1/mfa/setup`
-   - `POST /api/v1/mfa/verify`
-   - `POST /api/v1/mfa/challenge`
-   - `POST /api/v1/mfa/disable`
+1. **Database Schema:** `migrations/1787640000000_create_scim_tables.js`
+   - Added `is_active` and `external_id` columns to `users`.
+   - Created `tenant_scim_tokens`, `groups`, and `group_memberships` tables with RLS policies.
+2. **SCIM 2.0 Engine:** `src/lib/scim.ts`
+   - Secure SCIM bearer token generation (`createTenantScimToken`) and SHA-256 validation.
+   - Resource serializers for SCIM 2.0 User (`urn:ietf:params:scim:schemas:core:2.0:User`) and Group (`urn:ietf:params:scim:schemas:core:2.0:Group`).
+   - Full CRUD lifecycle with SCIM filter evaluation (`userName eq "..."`), pagination (`startIndex`, `count`), and patch operations (`active: false` deprovisioning).
+3. **Next.js App Router SCIM 2.0 Endpoints:**
+   - `GET /api/scim/v2/ServiceProviderConfig`
+   - `GET /api/scim/v2/ResourceTypes`
+   - `GET /api/scim/v2/Schemas`
+   - `GET /api/scim/v2/Users` & `POST /api/scim/v2/Users`
+   - `GET /api/scim/v2/Users/[id]`, `PUT /api/scim/v2/Users/[id]`, `PATCH /api/scim/v2/Users/[id]`, `DELETE /api/scim/v2/Users/[id]`
+   - `GET /api/scim/v2/Groups` & `POST /api/scim/v2/Groups`
+   - `GET /api/v1/scim/token` & `POST /api/v1/scim/token`
 
 ---
 
@@ -38,13 +35,13 @@ Implemented Enterprise Single Sign-On (SSO) engine supporting SAML, OIDC, Okta, 
 |---|---|---|---|:---:|
 | **QG-01** | Static Linting | `npm run lint` | 0 errors / 0 warnings | **PASSED** |
 | **QG-02** | Type Checking | `npm run type-check` | 0 errors | **PASSED** |
-| **QG-03** | Unit Tests | `npm run test:unit` | 15 suites, 100 tests passed | **PASSED** |
-| **QG-04** | Integration Tests | `npm run test:int` | 12 suites, 61 tests passed | **PASSED** |
+| **QG-03** | Unit Tests | `npm run test:unit` | 16 suites, 106 tests passed | **PASSED** |
+| **QG-04** | Integration Tests | `npm run test:int` | 13 suites, 69 tests passed | **PASSED** |
 | **QG-05** | Production Build | `npm run build` | Next.js compiled (0 errors) | **PASSED** |
 | **QG-06** | Security Audit | `npm run audit:sec` | 0 high/critical vulnerabilities | **PASSED** |
 
 ---
 
 ## 3. Checkpoint Information
-- **Git Commit:** `feat(phase-05A): implement enterprise SSO (SAML/OIDC), JIT provisioning, and TOTP/MFA [quality-gate: passed]`
-- **Next Planned Phase:** `PHASE-05B (SCIM 2.0 User Lifecycle Provisioning)`
+- **Git Commit:** `feat(phase-05B): implement SCIM 2.0 user lifecycle provisioning and groups [quality-gate: passed]`
+- **Next Planned Phase:** `PHASE-06A (Problem Management RCA & KEDB)`
