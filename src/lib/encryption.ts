@@ -39,3 +39,5 @@ export function decrypt(hash: string): string {
   
   return decrypted;
 }
+
+export { encrypt as encryptData, decrypt as decryptData };

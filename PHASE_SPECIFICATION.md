@@ -1,31 +1,36 @@
-# PHASE SPECIFICATION: PHASE-04B - Multi-Timezone Engine
+# PHASE SPECIFICATION: PHASE-05A - Enterprise SSO (SAML/OIDC) & MFA
 
 ---
 
 ## 1. Phase Metadata
-- **Phase ID:** `PHASE-04B`
-- **Parent Epic / Feature:** `Global Standards: Multi-Timezone Engine & Business Hours`
+- **Phase ID:** `PHASE-05A`
+- **Parent Epic / Feature:** `Global Standards: Enterprise SSO (SAML/OIDC) & Multi-Factor Authentication`
 - **Risk Level:** `HIGH`
-- **Estimated Scope:** `Medium (10-12 files)`
-- **Prerequisites / Dependencies:** `PHASE-01A`, `PHASE-01B`, `PHASE-02A`, `PHASE-02B`, `PHASE-02C`, `PHASE-03A`, `PHASE-03B`, `PHASE-04A`
+- **Estimated Scope:** `Medium (10-14 files)`
+- **Prerequisites / Dependencies:** `PHASE-01A`, `PHASE-01B`, `PHASE-02A`, `PHASE-02B`, `PHASE-02C`, `PHASE-03A`, `PHASE-03B`, `PHASE-04A`, `PHASE-04B`
 
 ---
 
 ## 2. Objective & Deliverables
 ### 2.1 Core Goal
-Implement Enterprise Multi-Timezone Engine with canonical UTC storage, IANA timezone conversions (`Asia/Bangkok`, `America/New_York`, `Europe/London`, `Asia/Tokyo`), Daylight Saving Time (DST) handling, and Timezone-aware Business Hours SLA deadline calculation (FR-GL-03).
+Implement Enterprise Single Sign-On (SSO) with Okta / Microsoft Entra ID / Google Workspace support, Just-In-Time (JIT) user auto-provisioning, and Multi-Factor Authentication (MFA) via RFC 6238 TOTP Authenticator and Backup Recovery Codes (FR-GL-04, FR-GL-06).
 
 ### 2.2 Expected Deliverables
 - [ ] Database Migrations:
-  - `migrations/1787620000000_add_timezone_support.js` (Add `timezone` and `business_hours` columns)
+  - `migrations/1787630000000_create_sso_and_mfa_tables.js` (Create `tenant_sso_configs`, `user_mfa_credentials` with RLS)
 - [ ] New modules/files created:
-  - `src/lib/timezone.ts` (Timezone conversion engine, DST calculator, business hours SLA schedule)
-  - `app/api/v1/timezones/route.ts` (GET supported timezones)
-  - `app/api/v1/timezones/convert/route.ts` (POST timestamp conversion)
-  - `app/api/v1/timezones/business-hours/route.ts` (GET & PATCH business hours & timezone config)
+  - `src/lib/sso.ts` (Tenant SSO config, SAML/OIDC payload validation, JIT provisioning engine)
+  - `src/lib/mfa.ts` (RFC 6238 TOTP generator & validator, backup codes generator & redemption)
+  - `app/api/v1/sso/config/route.ts` (GET & POST SSO configuration)
+  - `app/api/v1/sso/callback/route.ts` (POST SSO login callback & JIT)
+  - `app/api/v1/mfa/setup/route.ts` (POST generate TOTP secret & QR code uri)
+  - `app/api/v1/mfa/verify/route.ts` (POST verify and enable MFA)
+  - `app/api/v1/mfa/challenge/route.ts` (POST exchange MFA challenge code for session JWT)
+  - `app/api/v1/mfa/disable/route.ts` (POST disable MFA)
 - [ ] Unit & integration test files:
-  - `tests/unit/timezone.test.ts`
-  - `tests/integration/timezone.test.ts`
+  - `tests/unit/sso.test.ts`
+  - `tests/unit/mfa.test.ts`
+  - `tests/integration/sso.test.ts`
 - [ ] Documentation updates: `PHASE_REPORT.md`
 
 ---
@@ -33,7 +38,7 @@ Implement Enterprise Multi-Timezone Engine with canonical UTC storage, IANA time
 ## 3. Phase Contract & Acceptance Criteria
 | ID | Requirement | Verification Method | Pass Criteria |
 |---|---|---|---|
-| `AC-04B-01` | Canonical UTC Normalization | Unit Test | All stored and computed timestamps parse from and serialize to UTC ISO-8601 strings. |
-| `AC-04B-02` | Timezone & DST Conversion | Unit/Integration Test | Accurately converts between UTC and target IANA timezones factoring in Daylight Saving Time. |
-| `AC-04B-03` | Business Hours SLA Engine | Unit Test | Computes SLA deadlines strictly within tenant operating hours (skipping weekends & after-hours). |
-| `AC-04B-04` | Tenant Business Hours Config | Integration Test | Retrieves and updates tenant timezone and business hours schedule with RLS isolation. |
+| `AC-05A-01` | Enterprise SSO Configuration | Integration Test | Configures SAML / OIDC provider metadata with encryption of client secrets and certificates. |
+| `AC-05A-02` | JIT User Auto-Provisioning | Integration Test | Automatically provisions a new user record upon first valid SSO login if JIT is enabled. |
+| `AC-05A-03` | RFC 6238 TOTP & Backup Codes | Unit Test | Generates and verifies 6-digit TOTP codes against time-step window; generates 10 single-use recovery codes. |
+| `AC-05A-04` | MFA Login Challenge Flow | Integration Test | Enforces MFA verification challenge before granting final authenticated session JWT. |
