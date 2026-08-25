@@ -1,34 +1,31 @@
-# PHASE SPECIFICATION: PHASE-04A - Internationalization (i18n) & Multi-Currency
+# PHASE SPECIFICATION: PHASE-04B - Multi-Timezone Engine
 
 ---
 
 ## 1. Phase Metadata
-- **Phase ID:** `PHASE-04A`
-- **Parent Epic / Feature:** `Global Standards: i18n & Multi-Currency Engine`
-- **Risk Level:** `MEDIUM`
+- **Phase ID:** `PHASE-04B`
+- **Parent Epic / Feature:** `Global Standards: Multi-Timezone Engine & Business Hours`
+- **Risk Level:** `HIGH`
 - **Estimated Scope:** `Medium (10-12 files)`
-- **Prerequisites / Dependencies:** `PHASE-01A`, `PHASE-01B`, `PHASE-02A`, `PHASE-02B`, `PHASE-02C`, `PHASE-03A`, `PHASE-03B`
+- **Prerequisites / Dependencies:** `PHASE-01A`, `PHASE-01B`, `PHASE-02A`, `PHASE-02B`, `PHASE-02C`, `PHASE-03A`, `PHASE-03B`, `PHASE-04A`
 
 ---
 
 ## 2. Objective & Deliverables
 ### 2.1 Core Goal
-Implement complete Internationalization (i18n) Translation Dictionary Engine (`en`, `th`) with Fallback & Parameter Interpolation, Multi-Currency Exchange Rate Engine (`USD`, `THB`, `EUR`, `JPY`, `SGD`, `GBP`), and Tenant-level Localization Preference Settings (FR-GL-01, FR-GL-02).
+Implement Enterprise Multi-Timezone Engine with canonical UTC storage, IANA timezone conversions (`Asia/Bangkok`, `America/New_York`, `Europe/London`, `Asia/Tokyo`), Daylight Saving Time (DST) handling, and Timezone-aware Business Hours SLA deadline calculation (FR-GL-03).
 
 ### 2.2 Expected Deliverables
 - [ ] Database Migrations:
-  - `migrations/1787610000000_create_i18n_and_currencies_tables.js` (Create `exchange_rates`, `tenant_i18n_settings` with RLS & seed rates)
+  - `migrations/1787620000000_add_timezone_support.js` (Add `timezone` and `business_hours` columns)
 - [ ] New modules/files created:
-  - `src/lib/i18n.ts` (i18n dictionary, translation engine, parameter interpolation, fallback)
-  - `src/lib/currency.ts` (Currency converter, rate table, formatting)
-  - `app/api/v1/i18n/translations/route.ts` (GET dictionary & supported locales)
-  - `app/api/v1/i18n/settings/route.ts` (GET & PATCH tenant localization settings)
-  - `app/api/v1/currencies/rates/route.ts` (GET exchange rates)
-  - `app/api/v1/currencies/convert/route.ts` (POST currency conversion)
+  - `src/lib/timezone.ts` (Timezone conversion engine, DST calculator, business hours SLA schedule)
+  - `app/api/v1/timezones/route.ts` (GET supported timezones)
+  - `app/api/v1/timezones/convert/route.ts` (POST timestamp conversion)
+  - `app/api/v1/timezones/business-hours/route.ts` (GET & PATCH business hours & timezone config)
 - [ ] Unit & integration test files:
-  - `tests/unit/i18n.test.ts`
-  - `tests/unit/currency.test.ts`
-  - `tests/integration/i18n.test.ts`
+  - `tests/unit/timezone.test.ts`
+  - `tests/integration/timezone.test.ts`
 - [ ] Documentation updates: `PHASE_REPORT.md`
 
 ---
@@ -36,7 +33,7 @@ Implement complete Internationalization (i18n) Translation Dictionary Engine (`e
 ## 3. Phase Contract & Acceptance Criteria
 | ID | Requirement | Verification Method | Pass Criteria |
 |---|---|---|---|
-| `AC-04A-01` | Translation Fallback & Interpolation | Unit Test | Returns translated text; falls back to English when key missing; interpolates `{variables}`. |
-| `AC-04A-02` | Multi-Currency Conversion | Unit/Integration Test | Converts amounts across USD, THB, EUR, JPY, SGD using live/stored rates with 2-4 decimal precision. |
-| `AC-04A-03` | Currency Formatting | Unit Test | Formats currency with correct locale symbols (`$100.00`, `฿3,550.00`, `€92.00`). |
-| `AC-04A-04` | Tenant Localization Settings | Integration Test | Retrieves and updates tenant default language (`th`/`en`) and default currency (`THB`/`USD`). |
+| `AC-04B-01` | Canonical UTC Normalization | Unit Test | All stored and computed timestamps parse from and serialize to UTC ISO-8601 strings. |
+| `AC-04B-02` | Timezone & DST Conversion | Unit/Integration Test | Accurately converts between UTC and target IANA timezones factoring in Daylight Saving Time. |
+| `AC-04B-03` | Business Hours SLA Engine | Unit Test | Computes SLA deadlines strictly within tenant operating hours (skipping weekends & after-hours). |
+| `AC-04B-04` | Tenant Business Hours Config | Integration Test | Retrieves and updates tenant timezone and business hours schedule with RLS isolation. |
