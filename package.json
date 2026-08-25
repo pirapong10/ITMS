@@ -1,5 +1,6 @@
 {
     "scripts": {
+        "dev": "next dev",
         "lint": "eslint . --max-warnings=0",
         "type-check": "tsc --noEmit",
         "build": "next build",
