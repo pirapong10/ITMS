@@ -3,7 +3,7 @@
 ## 1. Project Information
 - **Project Name:** IT Service Management System (ITSM Enterprise - SaaS Edition)
 - **Application Type:** Enterprise Helpdesk, B2B SaaS Platform & IT Operations Management System
-- **Current Phase:** Phase 01B: Tenant Onboarding & Identity
+- **Current Phase:** Phase 02B: IT Asset & License Management
 - **Overall Status:** INITIALIZED
 - **Version:** v2.1.0 (Global Standards & Enterprise Compliance Enabled)
 
@@ -14,9 +14,9 @@
 | Phase | Phase Name | Scope & Key Modules | Complexity | Risk Level | Status |
 | :---: | :--- | :--- | :---: | :---: | :---: |
 | **01A** | **Database Schema & RLS Implementation** | SaaS Core Tables, Multi-Region Database Setup, Row-Level Security (RLS) for Tenant Isolation (FR-SA-02, NFR-SC-01) | High | High | **COMPLETED** |
-| **01B** | **Tenant Onboarding & Identity** | Self-Service Registration, Subdomain Routing, Data Encryption (AES-256), Basic Authentication (FR-SA-01, NFR-SC-02) | High | Medium | **IN PROGRESS** |
-| **02A** | **Helpdesk & SLA Engine** | Tickets Management, SLA Timer with UTC Normalization & Auto-Pause, MTTR Calculation (FR-TK-01, FR-GL-03) | High | High | PENDING |
-| **02B** | **IT Asset & License Management** | Asset Inventory, Depreciation (20%/yr), License Seats Allocation, Quotas Alerts (FR-AS-01, FR-LC-01) | Medium | Medium | PENDING |
+| **01B** | **Tenant Onboarding & Identity** | Self-Service Registration, Subdomain Routing, Data Encryption (AES-256), Basic Authentication (FR-SA-01, NFR-SC-02) | High | Medium | **COMPLETED** |
+| **02A** | **Helpdesk & SLA Engine** | Tickets Management, SLA Timer with UTC Normalization & Auto-Pause, MTTR Calculation (FR-TK-01, FR-GL-03) | High | High | **COMPLETED** |
+| **02B** | **IT Asset & License Management** | Asset Inventory, Depreciation (20%/yr), License Seats Allocation, Quotas Alerts (FR-AS-01, FR-LC-01) | Medium | Medium | **IN PROGRESS** |
 | **02C** | **Project, Task & Routine Management** | Project Gantt Chart, Kanban Board, Daily Routines, Preventive Maintenance, Borrow-Return Workflow (FR-PJ-01, FR-TS-01) | Medium | Low | PENDING |
 | **03A** | **Billing Engine & Payment Gateway** | Stripe/PayPal Integration, Subscription Plans Management, Multi-Currency Invoicing (FR-BL-01) | High | Medium | PENDING |
 | **03B** | **Super Admin Portal** | Cross-Region Tenants Management, Global Plans Configuration, Usage Monitoring | Medium | Low | PENDING |

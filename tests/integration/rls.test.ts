@@ -1,5 +1,5 @@
 import { query, withTenantTransaction, closePool } from '../../src/lib/db';
-import { v4 as uuidv4 } from 'uuid'; // need to install uuid
+import { randomUUID } from 'crypto';
 
 describe('Row-Level Security (RLS) Isolation', () => {
   let tenantAId: string;
@@ -41,7 +41,6 @@ describe('Row-Level Security (RLS) Isolation', () => {
   afterAll(async () => {
     // Clean up
     await query(`DELETE FROM tenants WHERE id IN ($1, $2)`, [tenantAId, tenantBId]);
-    await closePool();
   });
 
   it('Tenant A should only see Tenant A users', async () => {

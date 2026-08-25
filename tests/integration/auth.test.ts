@@ -8,7 +8,6 @@ describe('Auth API endpoints', () => {
   
   afterAll(async () => {
     await pool.query('DELETE FROM tenants WHERE subdomain = $1', [testSubdomain]);
-    await pool.end();
   });
 
   it('should register a new tenant and admin user', async () => {
