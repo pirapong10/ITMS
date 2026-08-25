@@ -68,10 +68,10 @@ export const CannedResponseSchema = z.object({
   shortcut_code: z.string().optional().nullable(),
 });
 
-export type CreateTicketInput = z.infer<typeof CreateTicketSchema>;
-export type UpdateTicketInput = z.infer<typeof UpdateTicketSchema>;
-export type ResolutionInput = z.infer<typeof ResolutionSchema>;
-export type CsatInput = z.infer<typeof CsatSchema>;
+export type CreateTicketInput = z.input<typeof CreateTicketSchema>;
+export type UpdateTicketInput = z.input<typeof UpdateTicketSchema>;
+export type ResolutionInput = z.input<typeof ResolutionSchema>;
+export type CsatInput = z.input<typeof CsatSchema>;
 export type CreateCannedResponseInput = z.infer<typeof CannedResponseSchema>;
 
 export interface TicketFilters {

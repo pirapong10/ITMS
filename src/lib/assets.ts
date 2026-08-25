@@ -41,8 +41,8 @@ export const UpdateAssetSchema = z.object({
   notes: z.string().optional().nullable(),
 });
 
-export type CreateAssetInput = z.infer<typeof CreateAssetSchema>;
-export type UpdateAssetInput = z.infer<typeof UpdateAssetSchema>;
+export type CreateAssetInput = z.input<typeof CreateAssetSchema>;
+export type UpdateAssetInput = z.input<typeof UpdateAssetSchema>;
 
 export interface AssetFilters {
   search?: string;

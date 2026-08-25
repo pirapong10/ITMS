@@ -40,9 +40,9 @@ export const AllocateSeatSchema = z.object({
   notes: z.string().optional().nullable(),
 });
 
-export type CreateLicenseInput = z.infer<typeof CreateLicenseSchema>;
-export type UpdateLicenseInput = z.infer<typeof UpdateLicenseSchema>;
-export type AllocateSeatInput = z.infer<typeof AllocateSeatSchema>;
+export type CreateLicenseInput = z.input<typeof CreateLicenseSchema>;
+export type UpdateLicenseInput = z.input<typeof UpdateLicenseSchema>;
+export type AllocateSeatInput = z.input<typeof AllocateSeatSchema>;
 
 export interface LicenseRecord {
   id: string;
