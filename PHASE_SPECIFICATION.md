@@ -1,37 +1,30 @@
-# PHASE SPECIFICATION: PHASE-07B - Open API & Webhooks Engine
+# PHASE SPECIFICATION: PHASE-08 - Accessibility (WCAG 2.1) & UI Polish
 
 ---
 
 ## 1. Phase Metadata
-- **Phase ID:** `PHASE-07B`
-- **Parent Epic / Feature:** `Global Standards: OpenAPI 3.0, API Keys, Rate Limiting & Event Webhooks`
-- **Risk Level:** `HIGH`
-- **Estimated Scope:** `Medium (12-14 files)`
-- **Prerequisites / Dependencies:** `PHASE-01A`, `PHASE-01B`, `PHASE-02A`, `PHASE-02B`, `PHASE-02C`, `PHASE-03A`, `PHASE-03B`, `PHASE-04A`, `PHASE-04B`, `PHASE-05A`, `PHASE-05B`, `PHASE-06A`, `PHASE-06B`, `PHASE-06C`, `PHASE-07A`
+- **Phase ID:** `PHASE-08`
+- **Parent Epic / Feature:** `Global Standards: WCAG 2.1 Accessibility, ARIA & Unified Global Search`
+- **Risk Level:** `LOW`
+- **Estimated Scope:** `Medium (10-12 files)`
+- **Prerequisites / Dependencies:** All previous phases (`PHASE-01A` through `PHASE-07B`)
 
 ---
 
 ## 2. Objective & Deliverables
 ### 2.1 Core Goal
-Implement OpenAPI 3.0 specification export, Scoped Tenant API Key management with sliding-window rate limiting (FR-GL-14), and an Event-Driven Outbound Webhook engine with HMAC-SHA256 signature verification and delivery log tracking (FR-GL-15).
+Implement WCAG 2.1 Level AA Accessibility compliance helper engine (contrast ratio calculator, ARIA roles, keyboard navigation handlers) and a high-performance Unified Multi-Module Global Search engine across tickets, assets, problems, changes, kb, and projects with tenant isolation (FR-GL-13).
 
 ### 2.2 Expected Deliverables
-- [ ] Database Migrations:
-  - `migrations/1787690000000_create_api_keys_and_webhooks_tables.js` (Create `tenant_api_keys`, `webhook_subscriptions`, `webhook_delivery_logs` with RLS)
 - [ ] New modules/files created:
-  - `src/lib/api-keys.ts` (API key generator `ak_live_...`, scope verification, rate limiter)
-  - `src/lib/webhooks.ts` (Webhook subscription, HMAC-SHA256 signature generator, event dispatcher, delivery logger)
-  - `app/api/v1/openapi.json/route.ts` (GET OpenAPI 3.0 document)
-  - `app/api/v1/api-keys/route.ts` (GET & POST API keys)
-  - `app/api/v1/api-keys/[id]/route.ts` (DELETE API key)
-  - `app/api/v1/webhooks/route.ts` (GET & POST subscriptions)
-  - `app/api/v1/webhooks/[id]/route.ts` (DELETE subscription)
-  - `app/api/v1/webhooks/[id]/deliveries/route.ts` (GET delivery logs)
-  - `app/api/v1/webhooks/test-dispatch/route.ts` (POST trigger test webhook event)
+  - `src/lib/search.ts` (Unified multi-module global search engine)
+  - `src/lib/a11y.ts` (WCAG 2.1 contrast ratio calculator, ARIA helpers)
+  - `app/api/v1/search/route.ts` (GET global search API)
+  - `app/api/v1/a11y/theme-contrast/route.ts` (GET theme contrast checker)
 - [ ] Unit & integration test files:
-  - `tests/unit/api-keys.test.ts`
-  - `tests/unit/webhooks.test.ts`
-  - `tests/integration/webhooks.test.ts`
+  - `tests/unit/search.test.ts`
+  - `tests/unit/a11y.test.ts`
+  - `tests/integration/search.test.ts`
 - [ ] Documentation updates: `PHASE_REPORT.md`
 
 ---
@@ -39,7 +32,7 @@ Implement OpenAPI 3.0 specification export, Scoped Tenant API Key management wit
 ## 3. Phase Contract & Acceptance Criteria
 | ID | Requirement | Verification Method | Pass Criteria |
 |---|---|---|---|
-| `AC-07B-01` | OpenAPI 3.0 Spec Endpoint | Integration Test | Returns valid OpenAPI 3.0 JSON specification describing ITSM endpoints. |
-| `AC-07B-02` | Scoped API Keys & Rate Limiting | Integration Test | Generates `ak_live_...` keys, validates scopes, and applies rate limit checks. |
-| `AC-07B-03` | Event-Driven Webhooks | Integration Test | Subscribes to events, signs payload with HMAC-SHA256 `X-ITSM-Signature`, and records delivery log. |
-| `AC-07B-04` | Multi-Tenant Data Isolation | Integration Test | Enforces tenant boundary on API keys, webhooks, and delivery logs. |
+| `AC-08-01` | Unified Global Search | Integration Test | Returns combined matching results from Tickets, Assets, Problems, Changes, and KB Articles. |
+| `AC-08-02` | WCAG 2.1 Contrast Ratio Engine | Unit Test | Validates foreground/background color combinations against 4.5:1 (Normal) and 3:1 (Large) thresholds. |
+| `AC-08-03` | ARIA Props Generator | Unit Test | Produces accessible ARIA metadata for dialogs, alerts, and navigation menus. |
+| `AC-08-04` | Multi-Tenant Data Isolation | Integration Test | Ensures Tenant B cannot view Tenant A search results. |
