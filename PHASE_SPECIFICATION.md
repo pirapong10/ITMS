@@ -1,35 +1,34 @@
-# PHASE SPECIFICATION: PHASE-06A - Problem Management (RCA & KEDB)
+# PHASE SPECIFICATION: PHASE-06B - Change Enablement & CAB Workflow
 
 ---
 
 ## 1. Phase Metadata
-- **Phase ID:** `PHASE-06A`
-- **Parent Epic / Feature:** `Global Standards: ITIL Problem Management, RCA & KEDB`
-- **Risk Level:** `MEDIUM`
+- **Phase ID:** `PHASE-06B`
+- **Parent Epic / Feature:** `Global Standards: ITIL Change Enablement & CAB Approval Workflow`
+- **Risk Level:** `HIGH`
 - **Estimated Scope:** `Medium (10-12 files)`
-- **Prerequisites / Dependencies:** `PHASE-01A`, `PHASE-01B`, `PHASE-02A`, `PHASE-02B`, `PHASE-02C`, `PHASE-03A`, `PHASE-03B`, `PHASE-04A`, `PHASE-04B`, `PHASE-05A`, `PHASE-05B`
+- **Prerequisites / Dependencies:** `PHASE-01A`, `PHASE-01B`, `PHASE-02A`, `PHASE-02B`, `PHASE-02C`, `PHASE-03A`, `PHASE-03B`, `PHASE-04A`, `PHASE-04B`, `PHASE-05A`, `PHASE-05B`, `PHASE-06A`
 
 ---
 
 ## 2. Objective & Deliverables
 ### 2.1 Core Goal
-Implement ITIL Problem Management module with Root Cause Analysis (RCA), Known Error Database (KEDB) publication, Incident Clustering (linking Helpdesk tickets to problems), and one-click resolution cascade (FR-GL-10).
+Implement ITIL Change Enablement with Change Request lifecycle (`CR-YYYY-XXXX`), Risk and Impact assessment, Implementation & Rollback plan documentation, Multi-stage CAB (Change Advisory Board) approval voting, and Post-Implementation Review (PIR) recording (FR-GL-11).
 
 ### 2.2 Expected Deliverables
 - [ ] Database Migrations:
-  - `migrations/1787650000000_create_problems_and_kedb_tables.js` (Create `problems`, `problem_ticket_links` with RLS)
+  - `migrations/1787660000000_create_change_requests_and_cab_tables.js` (Extend `change_requests`, create `cab_approvals` with RLS)
 - [ ] New modules/files created:
-  - `src/lib/problems.ts` (Problem lifecycle, running ID `PRB-YYYY-XXXX`, RCA, KEDB search, incident cascade)
-  - `app/api/v1/problems/route.ts` (GET & POST problems)
-  - `app/api/v1/problems/[id]/route.ts` (GET & PATCH problem)
-  - `app/api/v1/problems/[id]/link-tickets/route.ts` (POST link tickets)
-  - `app/api/v1/problems/[id]/link-tickets/[ticketId]/route.ts` (DELETE unlink ticket)
-  - `app/api/v1/problems/[id]/tickets/route.ts` (GET linked tickets)
-  - `app/api/v1/problems/[id]/resolve/route.ts` (POST resolve & cascade)
-  - `app/api/v1/kedb/route.ts` (GET search Known Error Database)
+  - `src/lib/changes.ts` (Change request lifecycle, running ID `CR-YYYY-XXXX`, CAB quorum calculator, execution & rollback tracker)
+  - `app/api/v1/changes/route.ts` (GET & POST change requests)
+  - `app/api/v1/changes/[id]/route.ts` (GET & PATCH change request)
+  - `app/api/v1/changes/[id]/submit-cab/route.ts` (POST submit for CAB review)
+  - `app/api/v1/changes/[id]/approve/route.ts` (POST record CAB decision)
+  - `app/api/v1/changes/[id]/execute/route.ts` (POST update execution state / PIR)
+  - `app/api/v1/changes/[id]/approvals/route.ts` (GET CAB approval list)
 - [ ] Unit & integration test files:
-  - `tests/unit/problems.test.ts`
-  - `tests/integration/problems.test.ts`
+  - `tests/unit/changes.test.ts`
+  - `tests/integration/changes.test.ts`
 - [ ] Documentation updates: `PHASE_REPORT.md`
 
 ---
@@ -37,7 +36,7 @@ Implement ITIL Problem Management module with Root Cause Analysis (RCA), Known E
 ## 3. Phase Contract & Acceptance Criteria
 | ID | Requirement | Verification Method | Pass Criteria |
 |---|---|---|---|
-| `AC-06A-01` | Problem Lifecycle & Running ID | Unit/Integration Test | Generates `PRB-YYYY-XXXX` and tracks states (`Open`, `Investigating`, `Known Error`, `Resolved`). |
-| `AC-06A-02` | Incident Clustering | Integration Test | Links and unlinks multiple helpdesk tickets to a problem record. |
-| `AC-06A-03` | Known Error Database (KEDB) | Integration Test | Publishes known errors with workarounds and allows instant full-text search. |
-| `AC-06A-04` | Resolution Cascade | Integration Test | Resolving a problem cascades resolution status and notes to all linked incident tickets. |
+| `AC-06B-01` | Change Request Running ID | Unit/Integration Test | Generates `CR-YYYY-XXXX` and enforces implementation & rollback plan validations. |
+| `AC-06B-02` | CAB Multi-Stage Approval | Integration Test | Distributes CAB reviews; aggregates multi-member decisions to approve or reject change. |
+| `AC-06B-03` | Change Execution & Rollback | Integration Test | Tracks implementation transitions (`Implementing` -> `Completed` / `Rolled Back`) with PIR notes. |
+| `AC-06B-04` | Tenant Isolation | Integration Test | Enforces strict multi-tenant boundary on change requests and CAB approval decisions. |
