@@ -1,37 +1,34 @@
-# PHASE SPECIFICATION: PHASE-02C - Project, Task & Routine Management
+# PHASE SPECIFICATION: PHASE-03A - Billing Engine & Payment Gateway
 
 ---
 
 ## 1. Phase Metadata
-- **Phase ID:** `PHASE-02C`
-- **Parent Epic / Feature:** `Project, Task & Routine Management`
+- **Phase ID:** `PHASE-03A`
+- **Parent Epic / Feature:** `Billing Engine & Payment Gateway`
 - **Risk Level:** `MEDIUM`
-- **Estimated Scope:** `Large (12-16 files)`
-- **Prerequisites / Dependencies:** `PHASE-01A`, `PHASE-01B`, `PHASE-02A`, `PHASE-02B`
+- **Estimated Scope:** `Large (10-14 files)`
+- **Prerequisites / Dependencies:** `PHASE-01A`, `PHASE-01B`, `PHASE-02A`, `PHASE-02B`, `PHASE-02C`
 
 ---
 
 ## 2. Objective & Deliverables
 ### 2.1 Core Goal
-Implement IT Project Portfolio with Milestone & Task Progress Auto-Calculation, Team Kanban Board (Drag-and-Drop Order Tracking), Equipment Borrow-Return Workflow with Overdue Alerts, Recurring Preventive Maintenance (PM Engine), and Daily Operations Checklists (CCTV/Backup) with One-Click Repair Ticket Integration (FR-PJ-01, FR-TS-01).
+Implement B2B SaaS Multi-Tenant Billing Engine, Tiered Subscription Plans (Starter, Professional, Enterprise), Stripe/PayPal Checkout Integration, Multi-Currency Invoicing (`INV-YYYY-XXXX`) with 7% VAT computation, Proration handling on plan switches, and Webhook Event processing (FR-BL-01).
 
 ### 2.2 Expected Deliverables
 - [ ] Database Migrations:
-  - `migrations/1787590000000_create_projects_tasks_and_routines_tables.js` (Create `projects`, `project_tasks`, `tasks`, `borrow_records`, `pm_schedules`, `routine_checklists` with RLS)
+  - `migrations/1787600000000_create_billing_and_subscriptions_tables.js` (Create `subscription_plans`, `tenant_subscriptions`, `invoices`, `payment_transactions` with RLS)
 - [ ] New modules/files created:
-  - `src/lib/projects.ts` (Project service, task progress % auto-calculation, Kanban order)
-  - `src/lib/routines.ts` (Borrow-return workflow, PM recurrence engine, checklist to ticket generator)
-  - `app/api/v1/projects/route.ts` & `app/api/v1/projects/[id]/route.ts`
-  - `app/api/v1/projects/[id]/tasks/route.ts` & `app/api/v1/projects/[id]/tasks/[taskId]/route.ts`
-  - `app/api/v1/tasks/route.ts` & `app/api/v1/tasks/[id]/route.ts`
-  - `app/api/v1/borrow-records/route.ts` & `app/api/v1/borrow-records/[id]/return/route.ts`
-  - `app/api/v1/pm-schedules/route.ts` & `app/api/v1/pm-schedules/[id]/execute/route.ts`
-  - `app/api/v1/routine-checklists/route.ts` & `app/api/v1/routine-checklists/[id]/create-ticket/route.ts`
+  - `src/lib/billing.ts` (Billing service, plan management, proration calculator, invoice generator, payment processor)
+  - `app/api/v1/billing/plans/route.ts` (GET subscription plans)
+  - `app/api/v1/billing/subscription/route.ts` (GET current subscription & POST create/upgrade)
+  - `app/api/v1/billing/subscription/cancel/route.ts` (POST cancel subscription)
+  - `app/api/v1/billing/invoices/route.ts` & `app/api/v1/billing/invoices/[id]/route.ts` (GET invoices)
+  - `app/api/v1/billing/checkout/route.ts` (POST create checkout session)
+  - `app/api/v1/billing/webhooks/route.ts` (POST webhook listener)
 - [ ] Unit & integration test files:
-  - `tests/unit/projects.test.ts`
-  - `tests/unit/routines.test.ts`
-  - `tests/integration/projects.test.ts`
-  - `tests/integration/routines.test.ts`
+  - `tests/unit/billing.test.ts`
+  - `tests/integration/billing.test.ts`
 - [ ] Documentation updates: `PHASE_REPORT.md`
 
 ---
@@ -39,9 +36,8 @@ Implement IT Project Portfolio with Milestone & Task Progress Auto-Calculation, 
 ## 3. Phase Contract & Acceptance Criteria
 | ID | Requirement | Verification Method | Pass Criteria |
 |---|---|---|---|
-| `AC-02C-01` | Project Auto-Progress % | Unit/Integration Test | Completing project tasks dynamically updates parent project `progress_percent` (0-100%). |
-| `AC-02C-02` | Kanban Task Status & Order | Unit/Integration Test | Moves tasks across columns (Backlog, Todo, In Progress, Review, Done) preserving order index. |
-| `AC-02C-03` | Borrow-Return Workflow | Integration Test | Records borrowed equipment; calculates overdue status; updates asset state upon return. |
-| `AC-02C-04` | PM Recurrence Engine | Unit/Integration Test | Accurately calculates next due date for Daily, Weekly, Monthly, Quarterly, Yearly intervals. |
-| `AC-02C-05` | Routine Fail to Ticket | Integration Test | Failed checklist item can trigger creation of linked repair ticket (`TK-YYYY-XXXX`). |
-| `AC-02C-06` | Multi-Tenant RLS | Integration Test | Strict RLS isolation across all project, task, borrow, PM, and checklist records. |
+| `AC-03A-01` | Subscription Plan Management | Unit/Integration Test | Returns available tiers (Starter, Pro, Enterprise) with monthly/yearly pricing in USD & THB. |
+| `AC-03A-02` | Subscription Lifecycle & Proration | Unit/Integration Test | Subscribes tenant to plan, calculates accurate proration on plan upgrade/downgrade. |
+| `AC-03A-03` | Multi-Currency Invoicing | Integration Test | Generates `INV-YYYY-XXXX` with accurate subtotal, 7% VAT, and total in specified currency. |
+| `AC-03A-04` | Payment Webhooks | Integration Test | Processes `payment_intent.succeeded` or `PAYMENT.CAPTURE.COMPLETED`, creates paid invoice & transaction log. |
+| `AC-03A-05` | Multi-Tenant Isolation | Integration Test | Ensures Tenant A cannot view or access invoices or payment transactions of Tenant B. |
