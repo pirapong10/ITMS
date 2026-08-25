@@ -1,34 +1,34 @@
 # PHASE COMPLETION REPORT
 
-- **Phase ID:** `PHASE-07A`
-- **Phase Name:** `Immutable Logs & Data Privacy (GDPR/PDPA)`
-- **Completion Timestamp:** `2026-08-25T08:46:42+07:00`
+- **Phase ID:** `PHASE-07B`
+- **Phase Name:** `Open API & Webhooks Engine`
+- **Completion Timestamp:** `2026-08-25T08:49:32+07:00`
 - **Sign-Off Status:** `COMPLETED (Quality Gates 100% Passed)`
 
 ---
 
 ## 1. Executive Summary & Deliverables
-Implemented SOC 2 Type II compliant Append-Only Immutable Audit Trail with cryptographic SHA-256 hash chaining and tamper-evident integrity verification, along with GDPR / PDPA Data Subject Access Request (DSAR) workflows for personal data aggregation export and Right to be Forgotten (PII sanitization & anonymization).
+Implemented OpenAPI 3.0 specification export endpoint, Scoped Tenant API Key management with sliding-window rate limiting (100-5000 req/min), and an Event-Driven Outbound Webhook subscription and delivery engine with HMAC-SHA256 signature verification (`X-ITSM-Signature`).
 
 ### Core Modules Delivered:
-1. **Database Schema:** `migrations/1787680000000_create_audit_and_privacy_tables.js`
-   - Created `immutable_audit_logs` table with `prev_hash`, `log_hash`, and Row-Level Security.
-   - Created `privacy_dsar_requests` table with request tracking and Row-Level Security.
-2. **Audit Service:** `src/lib/audit.ts`
-   - Cryptographic SHA-256 hash-chaining engine (`computeLogHash`, `logAuditEvent`).
-   - Tamper verification engine (`verifyAuditChain`).
-   - Query engine with resource, action, and actor filtering.
-3. **Data Privacy Service:** `src/lib/privacy.ts`
-   - DSAR lifecycle manager (`createDsarRequest`, `listDsarRequests`, `getDsarRequestById`).
-   - GDPR Personal Data aggregation export engine (`processDsarExport`).
-   - GDPR Right to be Forgotten / Anonymization engine (`processDsarErasure`).
+1. **Database Schema:** `migrations/1787690000000_create_api_keys_and_webhooks_tables.js`
+   - Created `tenant_api_keys`, `webhook_subscriptions`, and `webhook_delivery_logs` tables with Row-Level Security.
+2. **API Keys & Rate Limiting Service:** `src/lib/api-keys.ts`
+   - Secure API key generator (`ak_live_...`) with SHA-256 hash storage.
+   - Sliding-window in-memory rate limiter with standard headers (`X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`).
+   - Granular scope matching engine (`tickets:read`, `tickets:write`, `assets:read`, `*.*`).
+3. **Event-Driven Webhook Service:** `src/lib/webhooks.ts`
+   - Webhook subscription lifecycle management (`createWebhookSubscription`, `listWebhookSubscriptions`, `deleteWebhookSubscription`).
+   - HMAC-SHA256 payload signing engine (`signWebhookPayload`).
+   - Event dispatching engine (`dispatchWebhookEvent`) and delivery attempt logging (`webhook_delivery_logs`).
 4. **Next.js App Router Endpoints:**
-   - `GET /api/v1/audit/logs`
-   - `POST /api/v1/audit/verify`
-   - `GET /api/v1/privacy/dsar` & `POST /api/v1/privacy/dsar`
-   - `GET /api/v1/privacy/dsar/[id]`
-   - `POST /api/v1/privacy/dsar/[id]/process-export`
-   - `POST /api/v1/privacy/dsar/[id]/process-erasure`
+   - `GET /api/v1/openapi.json`
+   - `GET /api/v1/api-keys` & `POST /api/v1/api-keys`
+   - `DELETE /api/v1/api-keys/[id]`
+   - `GET /api/v1/webhooks` & `POST /api/v1/webhooks`
+   - `DELETE /api/v1/webhooks/[id]`
+   - `GET /api/v1/webhooks/[id]/deliveries`
+   - `POST /api/v1/webhooks/test-dispatch`
 
 ---
 
@@ -38,13 +38,13 @@ Implemented SOC 2 Type II compliant Append-Only Immutable Audit Trail with crypt
 |---|---|---|---|:---:|
 | **QG-01** | Static Linting | `npm run lint` | 0 errors / 0 warnings | **PASSED** |
 | **QG-02** | Type Checking | `npm run type-check` | 0 errors | **PASSED** |
-| **QG-03** | Unit Tests | `npm run test:unit` | 21 suites, 127 tests passed | **PASSED** |
-| **QG-04** | Integration Tests | `npm run test:int` | 17 suites, 93 tests passed | **PASSED** |
+| **QG-03** | Unit Tests | `npm run test:unit` | 23 suites, 133 tests passed | **PASSED** |
+| **QG-04** | Integration Tests | `npm run test:int` | 18 suites, 98 tests passed | **PASSED** |
 | **QG-05** | Production Build | `npm run build` | Next.js compiled (0 errors) | **PASSED** |
 | **QG-06** | Security Audit | `npm run audit:sec` | 0 high/critical vulnerabilities | **PASSED** |
 
 ---
 
 ## 3. Checkpoint Information
-- **Git Commit:** `feat(phase-07A): implement SOC 2 immutable audit logging and GDPR/PDPA data privacy [quality-gate: passed]`
-- **Next Planned Phase:** `PHASE-07B (Open API & Webhooks Engine)`
+- **Git Commit:** `feat(phase-07B): implement OpenAPI 3.0, scoped API keys, rate limiting, and event webhooks [quality-gate: passed]`
+- **Next Planned Phase:** `PHASE-08 (Accessibility WCAG 2.1 & UI Polish)`
