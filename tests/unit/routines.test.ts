@@ -3,9 +3,30 @@ import {
   CreateBorrowRecordSchema,
   CreatePmScheduleSchema,
   CreateRoutineChecklistSchema,
+  createBorrowRecord,
+  listBorrowRecords,
+  returnBorrowRecord,
+  createPmSchedule,
+  listPmSchedules,
+  executePmSchedule,
+  createRoutineChecklist,
+  listRoutineChecklists,
+  createTicketFromFailedChecklist,
 } from '../../src/lib/routines';
+import * as db from '../../src/lib/db';
+import * as tickets from '../../src/lib/tickets';
+
+jest.mock('../../src/lib/db');
+jest.mock('../../src/lib/tickets');
 
 describe('Routines, PM & Borrow Management (Unit Tests)', () => {
+  const mockWithTenantTransaction = db.withTenantTransaction as jest.Mock;
+  const mockCreateTicket = tickets.createTicket as jest.Mock;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe('PM Recurrence Calculation Engine', () => {
     const baseDate = new Date('2026-08-01T00:00:00.000Z');
 
@@ -35,41 +56,186 @@ describe('Routines, PM & Borrow Management (Unit Tests)', () => {
     });
   });
 
-  describe('Validation Schemas', () => {
-    it('should validate valid borrow record payload', () => {
-      const payload = {
-        asset_id: 'ast-12345',
+  describe('Borrow Operations', () => {
+    const tenantId = 'tenant-123';
+
+    it('should create borrow record and update asset status to In Use', async () => {
+      const mockBorrow = {
+        id: 'bw-1',
+        borrow_code: 'BW-2026-0001',
+        asset_id: 'ast-1',
         borrower_name: 'Jane Doe',
-        borrower_email: 'jane@company.com',
+      };
+
+      mockWithTenantTransaction.mockImplementation(async (tid, cb) => {
+        const client = {
+          query: jest
+            .fn()
+            .mockResolvedValueOnce({ rows: [{ count: '0' }] })
+            .mockResolvedValueOnce({ rows: [mockBorrow] })
+            .mockResolvedValueOnce({ rows: [] }),
+        };
+        return cb(client);
+      });
+
+      const res = await createBorrowRecord(tenantId, {
+        asset_id: 'ast-1',
+        borrower_name: 'Jane Doe',
         expected_return_date: '2026-09-01T00:00:00.000Z',
-      };
-      const parsed = CreateBorrowRecordSchema.parse(payload);
-      expect(parsed.borrower_name).toBe('Jane Doe');
+      });
+
+      expect(res.borrow_code).toBe('BW-2026-0001');
     });
 
-    it('should validate valid PM schedule payload', () => {
-      const payload = {
-        title: 'Quarterly Datacenter UPS Battery Health Check',
-        target_type: 'System' as const,
-        recurrence: 'Quarterly' as const,
-        next_due_date: '2026-09-15T00:00:00.000Z',
-        checklist_items: ['Check voltage', 'Inspect electrolyte levels', 'Clean terminals'],
-      };
-      const parsed = CreatePmScheduleSchema.parse(payload);
-      expect(parsed.title).toContain('UPS Battery');
-      expect(parsed.checklist_items.length).toBe(3);
+    it('should list borrow records and dynamically compute Overdue status', async () => {
+      const mockRecords = [
+        {
+          id: 'bw-1',
+          status: 'Borrowed',
+          expected_return_date: '2020-01-01T00:00:00.000Z',
+        },
+        {
+          id: 'bw-2',
+          status: 'Borrowed',
+          expected_return_date: '2099-01-01T00:00:00.000Z',
+        },
+      ];
+
+      mockWithTenantTransaction.mockImplementation(async (tid, cb) => {
+        const client = {
+          query: jest.fn().mockResolvedValueOnce({ rows: mockRecords }),
+        };
+        return cb(client);
+      });
+
+      const res = await listBorrowRecords(tenantId, { status: 'Borrowed' });
+      expect(res[0].status).toBe('Overdue');
+      expect(res[1].status).toBe('Borrowed');
     });
 
-    it('should validate valid Routine Checklist payload', () => {
-      const payload = {
-        category: 'CCTV' as const,
-        item_name: 'Building B - 3rd Floor East Corridor',
-        status: 'Pass' as const,
-        checked_by: 'Guard Officer',
-      };
-      const parsed = CreateRoutineChecklistSchema.parse(payload);
-      expect(parsed.category).toBe('CCTV');
-      expect(parsed.status).toBe('Pass');
+    it('should return borrow record and update asset status to In Stock', async () => {
+      const currentRecord = { id: 'bw-1', asset_id: 'ast-1' };
+      const returnedRecord = { ...currentRecord, status: 'Returned' };
+
+      mockWithTenantTransaction.mockImplementation(async (tid, cb) => {
+        const client = {
+          query: jest
+            .fn()
+            .mockResolvedValueOnce({ rows: [currentRecord] })
+            .mockResolvedValueOnce({ rows: [returnedRecord] })
+            .mockResolvedValueOnce({ rows: [] }),
+        };
+        return cb(client);
+      });
+
+      const res = await returnBorrowRecord(tenantId, 'bw-1', {
+        condition_on_return: 'Good condition',
+      });
+      expect(res.status).toBe('Returned');
+    });
+
+    it('should throw error when returning nonexistent borrow record', async () => {
+      mockWithTenantTransaction.mockImplementation(async (tid, cb) => {
+        const client = {
+          query: jest.fn().mockResolvedValueOnce({ rows: [] }),
+        };
+        return cb(client);
+      });
+
+      await expect(returnBorrowRecord(tenantId, 'bw-404', {})).rejects.toThrow('Borrow record not found');
+    });
+  });
+
+  describe('PM Schedules & Checklists', () => {
+    const tenantId = 'tenant-123';
+
+    it('should create and list PM schedules', async () => {
+      mockWithTenantTransaction.mockImplementation(async (tid, cb) => {
+        const client = {
+          query: jest
+            .fn()
+            .mockResolvedValueOnce({ rows: [{ count: '0' }] })
+            .mockResolvedValueOnce({ rows: [{ id: 'pm-1', title: 'UPS Check' }] }),
+        };
+        return cb(client);
+      });
+
+      const pm = await createPmSchedule(tenantId, {
+        title: 'UPS Check',
+        target_type: 'System',
+        recurrence: 'Monthly',
+        next_due_date: '2026-09-01T00:00:00.000Z',
+      });
+      expect(pm.id).toBe('pm-1');
+
+      mockWithTenantTransaction.mockImplementation(async (tid, cb) => {
+        const client = {
+          query: jest.fn().mockResolvedValueOnce({ rows: [{ id: 'pm-1' }] }),
+        };
+        return cb(client);
+      });
+
+      const list = await listPmSchedules(tenantId);
+      expect(list.length).toBe(1);
+    });
+
+    it('should execute PM schedule and calculate next due date', async () => {
+      mockWithTenantTransaction.mockImplementation(async (tid, cb) => {
+        const client = {
+          query: jest
+            .fn()
+            .mockResolvedValueOnce({ rows: [{ id: 'pm-1', recurrence: 'Monthly' }] })
+            .mockResolvedValueOnce({ rows: [{ id: 'pm-1', next_due_date: '2026-09-28' }] }),
+        };
+        return cb(client);
+      });
+
+      const res = await executePmSchedule(tenantId, 'pm-1');
+      expect(res.id).toBe('pm-1');
+    });
+
+    it('should create, list routine checklists, and create ticket from failed checklist', async () => {
+      mockWithTenantTransaction.mockImplementation(async (tid, cb) => {
+        const client = {
+          query: jest.fn().mockResolvedValueOnce({ rows: [{ id: 'chk-1', item_name: 'CCTV 1' }] }),
+        };
+        return cb(client);
+      });
+
+      const chk = await createRoutineChecklist(tenantId, {
+        category: 'CCTV',
+        item_name: 'CCTV 1',
+        status: 'Fail',
+        remarks: 'Camera broken',
+      });
+      expect(chk.id).toBe('chk-1');
+
+      mockWithTenantTransaction.mockImplementation(async (tid, cb) => {
+        const client = {
+          query: jest.fn().mockResolvedValueOnce({ rows: [{ id: 'chk-1' }] }),
+        };
+        return cb(client);
+      });
+
+      const list = await listRoutineChecklists(tenantId, 'CCTV');
+      expect(list.length).toBe(1);
+
+      mockCreateTicket.mockResolvedValueOnce({ id: 'tk-repair-1' });
+
+      mockWithTenantTransaction.mockImplementation(async (tid, cb) => {
+        const client = {
+          query: jest
+            .fn()
+            .mockResolvedValueOnce({
+              rows: [{ id: 'chk-1', category: 'CCTV', item_name: 'CCTV 1', check_date: '2026-08-25' }],
+            })
+            .mockResolvedValueOnce({ rows: [] }),
+        };
+        return cb(client);
+      });
+
+      const ticket = await createTicketFromFailedChecklist(tenantId, 'chk-1');
+      expect(ticket.id).toBe('tk-repair-1');
     });
   });
 });

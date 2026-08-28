@@ -7,9 +7,29 @@ import {
   ScimGroupCreateSchema,
   SCIM_USER_SCHEMA,
   SCIM_GROUP_SCHEMA,
+  createTenantScimToken,
+  authenticateScimRequest,
+  scimListUsers,
+  scimGetUser,
+  scimCreateUser,
+  scimUpdateUser,
+  scimPatchUser,
+  scimDeleteUser,
+  scimListGroups,
+  scimCreateGroup,
 } from '../../src/lib/scim';
+import * as db from '../../src/lib/db';
+
+jest.mock('../../src/lib/db');
 
 describe('SCIM 2.0 Engine (Unit Tests)', () => {
+  const mockWithTenantTransaction = db.withTenantTransaction as jest.Mock;
+  const mockQuery = db.query as jest.Mock;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe('Resource Formatting', () => {
     it('should format database user record into RFC 7643 SCIM User', () => {
       const mockUser = {
@@ -47,6 +67,197 @@ describe('SCIM 2.0 Engine (Unit Tests)', () => {
       expect(scimGroup.displayName).toBe('IT Support Tier 1');
       expect(scimGroup.members.length).toBe(1);
       expect(scimGroup.members[0].value).toBe('usr-1');
+    });
+  });
+
+  describe('Authentication & Token Generation', () => {
+    it('should generate scim token and store hash', async () => {
+      mockWithTenantTransaction.mockImplementation(async (tid, cb) => {
+        const client = {
+          query: jest.fn().mockResolvedValueOnce({ rows: [] }),
+        };
+        return cb(client);
+      });
+
+      const res = await createTenantScimToken('tenant-123', 'Okta');
+      expect(res.rawToken).toMatch(/^scim_/);
+    });
+
+    it('should authenticate SCIM request with valid bearer token', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [{ tenant_id: 'tenant-123' }] });
+
+      const req = new Request('http://localhost/api/scim/v2/Users', {
+        headers: { Authorization: 'Bearer scim_valid_token_here' },
+      });
+
+      const tenantId = await authenticateScimRequest(req);
+      expect(tenantId).toBe('tenant-123');
+    });
+
+    it('should reject request without bearer authorization header', async () => {
+      const req = new Request('http://localhost/api/scim/v2/Users');
+      const tenantId = await authenticateScimRequest(req);
+      expect(tenantId).toBeNull();
+    });
+  });
+
+  describe('SCIM User Operations', () => {
+    const tenantId = 'tenant-123';
+
+    it('should list SCIM users with filter and pagination', async () => {
+      const mockUser = {
+        id: 'u1',
+        name: 'Bob',
+        email: 'bob@example.com',
+        role: 'User',
+        is_active: true,
+        created_at: new Date().toISOString(),
+      };
+
+      mockWithTenantTransaction.mockImplementation(async (tid, cb) => {
+        const client = {
+          query: jest
+            .fn()
+            .mockResolvedValueOnce({ rows: [{ count: '1' }] })
+            .mockResolvedValueOnce({ rows: [mockUser] }),
+        };
+        return cb(client);
+      });
+
+      const res = await scimListUsers(tenantId, { filter: 'userName eq "bob@example.com"' });
+      expect(res.totalResults).toBe(1);
+      expect(res.Resources.length).toBe(1);
+    });
+
+    it('should get SCIM user by ID or return null if not found', async () => {
+      mockWithTenantTransaction.mockImplementation(async (tid, cb) => {
+        const client = {
+          query: jest.fn().mockResolvedValueOnce({ rows: [] }),
+        };
+        return cb(client);
+      });
+
+      const user = await scimGetUser(tenantId, 'u-404');
+      expect(user).toBeNull();
+    });
+
+    it('should create SCIM user', async () => {
+      const mockUser = {
+        id: 'u1',
+        name: 'Alice Cooper',
+        email: 'alice@example.com',
+        role: 'Technician',
+        is_active: true,
+        created_at: new Date().toISOString(),
+      };
+
+      mockWithTenantTransaction.mockImplementation(async (tid, cb) => {
+        const client = {
+          query: jest
+            .fn()
+            .mockResolvedValueOnce({ rows: [] }) // check uniqueness -> no duplicate
+            .mockResolvedValueOnce({ rows: [mockUser] }), // insert user
+        };
+        return cb(client);
+      });
+
+      const res = await scimCreateUser(tenantId, {
+        schemas: [SCIM_USER_SCHEMA],
+        userName: 'alice@example.com',
+        name: { givenName: 'Alice', familyName: 'Cooper' },
+        active: true,
+        roles: [{ value: 'Technician', primary: true }],
+      });
+
+      expect(res.userName).toBe('alice@example.com');
+    });
+
+    it('should update and patch SCIM user', async () => {
+      const mockUser = {
+        id: 'u1',
+        name: 'Alice Cooper',
+        email: 'alice@example.com',
+        role: 'Admin',
+        is_active: true,
+        created_at: new Date().toISOString(),
+      };
+
+      mockWithTenantTransaction.mockImplementation(async (tid, cb) => {
+        const client = {
+          query: jest.fn().mockResolvedValueOnce({ rows: [mockUser] }),
+        };
+        return cb(client);
+      });
+
+      const updated = await scimUpdateUser(tenantId, 'u1', {
+        schemas: [SCIM_USER_SCHEMA],
+        userName: 'alice@example.com',
+        name: { formatted: 'Alice Cooper' },
+        roles: [{ value: 'Admin' }],
+      });
+      expect(updated.roles[0].value).toBe('Admin');
+
+      mockWithTenantTransaction.mockImplementation(async (tid, cb) => {
+        const client = {
+          query: jest
+            .fn()
+            .mockResolvedValueOnce({ rows: [mockUser] }) // select existing
+            .mockResolvedValueOnce({ rows: [{ ...mockUser, is_active: false }] }), // update
+        };
+        return cb(client);
+      });
+
+      const patched = await scimPatchUser(tenantId, 'u1', {
+        Operations: [{ op: 'replace', path: 'active', value: false }],
+      });
+      expect(patched.active).toBe(false);
+    });
+
+    it('should delete SCIM user', async () => {
+      mockWithTenantTransaction.mockImplementation(async (tid, cb) => {
+        const client = {
+          query: jest.fn().mockResolvedValueOnce({ rows: [{ id: 'u1' }] }),
+        };
+        return cb(client);
+      });
+
+      const res = await scimDeleteUser(tenantId, 'u1');
+      expect(res).toBe(true);
+    });
+  });
+
+  describe('SCIM Group Operations', () => {
+    const tenantId = 'tenant-123';
+
+    it('should list SCIM groups and create SCIM group', async () => {
+      mockWithTenantTransaction.mockImplementation(async (tid, cb) => {
+        const client = {
+          query: jest
+            .fn()
+            .mockResolvedValueOnce({ rows: [{ id: 'grp-1', display_name: 'Engineers' }] })
+            .mockResolvedValueOnce({ rows: [] }),
+        };
+        return cb(client);
+      });
+
+      const groups = await scimListGroups(tenantId);
+      expect(groups.totalResults).toBe(1);
+
+      mockWithTenantTransaction.mockImplementation(async (tid, cb) => {
+        const client = {
+          query: jest
+            .fn()
+            .mockResolvedValueOnce({ rows: [{ id: 'grp-2', display_name: 'DevOps' }] })
+            .mockResolvedValueOnce({ rows: [] }),
+        };
+        return cb(client);
+      });
+
+      const newGrp = await scimCreateGroup(tenantId, {
+        displayName: 'DevOps',
+        members: [{ value: 'usr-1' }],
+      });
+      expect(newGrp.displayName).toBe('DevOps');
     });
   });
 

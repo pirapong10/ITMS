@@ -7,9 +7,23 @@ import {
   generateBackupCodes,
   VerifyMfaSchema,
   MfaChallengeSchema,
+  setupUserMfa,
+  verifyAndEnableMfa,
+  validateMfaChallenge,
+  disableUserMfa,
 } from '../../src/lib/mfa';
+import * as db from '../../src/lib/db';
+import { encryptData } from '../../src/lib/encryption';
+
+jest.mock('../../src/lib/db');
 
 describe('Multi-Factor Authentication (MFA) & TOTP (Unit Tests)', () => {
+  const mockWithTenantTransaction = db.withTenantTransaction as jest.Mock;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe('Base32 Encoding & Decoding', () => {
     it('should encode and decode buffer roundtrip accurately', () => {
       const original = Buffer.from('HelloWorld123');
@@ -57,6 +71,116 @@ describe('Multi-Factor Authentication (MFA) & TOTP (Unit Tests)', () => {
       for (const code of codes) {
         expect(code).toMatch(/^[0-9A-F]{8}$/);
       }
+    });
+  });
+
+  describe('MFA Setup, Verification & Challenge Validation', () => {
+    const tenantId = 'tenant-123';
+    const userId = 'user-456';
+
+    it('should initiate MFA setup for user', async () => {
+      mockWithTenantTransaction.mockImplementation(async (tid, cb) => {
+        const client = {
+          query: jest.fn().mockResolvedValue({ rows: [] }),
+        };
+        return cb(client);
+      });
+
+      const res = await setupUserMfa(tenantId, userId, 'user@example.com');
+      expect(res.secret).toBeDefined();
+      expect(res.qrUri).toContain('user%40example.com');
+      expect(res.backupCodes.length).toBe(10);
+    });
+
+    it('should verify and enable MFA with valid TOTP code', async () => {
+      const secret = generateTotpSecret(20);
+      const encryptedSecret = encryptData(secret);
+      const validCode = generateTotpCode(secret);
+
+      mockWithTenantTransaction.mockImplementation(async (tid, cb) => {
+        const client = {
+          query: jest
+            .fn()
+            .mockResolvedValueOnce({ rows: [{ id: 'cred-1', secret_encrypted: encryptedSecret }] })
+            .mockResolvedValueOnce({ rows: [] }),
+        };
+        return cb(client);
+      });
+
+      const res = await verifyAndEnableMfa(tenantId, userId, validCode);
+      expect(res.success).toBe(true);
+    });
+
+    it('should throw error when verifying with invalid code', async () => {
+      const secret = generateTotpSecret(20);
+      const encryptedSecret = encryptData(secret);
+
+      mockWithTenantTransaction.mockImplementation(async (tid, cb) => {
+        const client = {
+          query: jest
+            .fn()
+            .mockResolvedValueOnce({ rows: [{ id: 'cred-1', secret_encrypted: encryptedSecret }] }),
+        };
+        return cb(client);
+      });
+
+      await expect(verifyAndEnableMfa(tenantId, userId, '000000')).rejects.toThrow('Invalid TOTP verification code');
+    });
+
+    it('should validate MFA challenge via TOTP code during login', async () => {
+      const secret = generateTotpSecret(20);
+      const encryptedSecret = encryptData(secret);
+      const validCode = generateTotpCode(secret);
+
+      mockWithTenantTransaction.mockImplementation(async (tid, cb) => {
+        const client = {
+          query: jest
+            .fn()
+            .mockResolvedValueOnce({ rows: [{ id: 'cred-1', secret_encrypted: encryptedSecret, backup_codes: '[]' }] })
+            .mockResolvedValueOnce({ rows: [{ role: 'Technician' }] }),
+        };
+        return cb(client);
+      });
+
+      const res = await validateMfaChallenge(tenantId, userId, validCode);
+      expect(res.success).toBe(true);
+      expect(res.methodUsed).toBe('TOTP');
+      expect(res.token).toBeDefined();
+    });
+
+    it('should validate MFA challenge via single-use Backup Code and consume it', async () => {
+      const secret = generateTotpSecret(20);
+      const encryptedSecret = encryptData(secret);
+      const backupCodes = ['11223344', '55667788'];
+
+      mockWithTenantTransaction.mockImplementation(async (tid, cb) => {
+        const client = {
+          query: jest
+            .fn()
+            .mockResolvedValueOnce({
+              rows: [{ id: 'cred-1', secret_encrypted: encryptedSecret, backup_codes: JSON.stringify(backupCodes) }],
+            })
+            .mockResolvedValueOnce({ rows: [] }) // update consumed backup codes
+            .mockResolvedValueOnce({ rows: [{ role: 'User' }] }), // select user
+        };
+        return cb(client);
+      });
+
+      const res = await validateMfaChallenge(tenantId, userId, '11223344');
+      expect(res.success).toBe(true);
+      expect(res.methodUsed).toBe('BACKUP_CODE');
+    });
+
+    it('should disable MFA for user', async () => {
+      mockWithTenantTransaction.mockImplementation(async (tid, cb) => {
+        const client = {
+          query: jest.fn().mockResolvedValueOnce({ rows: [{ id: 'cred-1' }] }),
+        };
+        return cb(client);
+      });
+
+      const res = await disableUserMfa(tenantId, userId);
+      expect(res).toBe(true);
     });
   });
 
