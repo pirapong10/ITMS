@@ -26,12 +26,11 @@ export async function POST(req: Request) {
     let tenantId: string | null = null;
 
     if (tenantIdentifier) {
-      // Check if identifier is a UUID or a subdomain
       const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(tenantIdentifier);
       
       let tenantRes;
       if (isUuid) {
-        tenantRes = await pool.query('SELECT id FROM tenants WHERE id = $1 OR subdomain = $2', [tenantIdentifier, tenantIdentifier]);
+        tenantRes = await pool.query('SELECT id FROM tenants WHERE id = $1', [tenantIdentifier]);
       } else {
         tenantRes = await pool.query('SELECT id FROM tenants WHERE subdomain = $1', [tenantIdentifier]);
       }
@@ -41,8 +40,8 @@ export async function POST(req: Request) {
       }
     }
 
-    // Find user
-    let userQuery = 'SELECT id, tenant_id, name, email, role, password_hash, mfa_enabled FROM users WHERE email = $1';
+    // Find user by email and optional tenant_id
+    let userQuery = 'SELECT id, tenant_id, name, email, role, password_hash FROM users WHERE email = $1';
     const queryParams: any[] = [email];
 
     if (tenantId) {
@@ -64,8 +63,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง (Invalid email or password)' }, { status: 401 });
     }
 
-    // Check if MFA is enabled
-    if (user.mfa_enabled) {
+    // Check if MFA is verified and active for this user
+    const mfaRes = await pool.query(
+      'SELECT id FROM user_mfa_credentials WHERE user_id = $1 AND is_verified = true',
+      [user.id]
+    );
+
+    if (mfaRes.rows.length > 0) {
       return NextResponse.json({
         mfa_required: true,
         user_id: user.id,
