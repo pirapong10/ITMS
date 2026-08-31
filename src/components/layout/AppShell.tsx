@@ -23,12 +23,11 @@ export function AppShell({ children }: AppShellProps) {
     const token = getStoredToken();
 
     if (!token && !isAuthPage) {
-      // Redirect unauthenticated user to login
-      router.replace(`/login?redirect=${encodeURIComponent(pathname || '/')}`);
+      window.location.replace(`/login?redirect=${encodeURIComponent(pathname || '/')}`);
     } else {
       setIsAuthChecking(false);
     }
-  }, [pathname, router]);
+  }, [pathname]);
 
   // Loading skeleton while verifying session
   if (isAuthChecking) {
