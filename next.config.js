@@ -1,6 +1,10 @@
 /** @type {import('next').NextConfig} */
+const isVercel = process.env.VERCEL === '1' || !!process.env.VERCEL_ENV;
+const isDockerBuild = process.env.BUILD_STANDALONE === 'true' || process.env.DOCKER_BUILD === 'true';
+
 const nextConfig = {
-  output: 'standalone',
+  // Only use standalone output when explicitly building for Docker/Self-hosted (NOT on Vercel)
+  ...(!isVercel && isDockerBuild ? { output: 'standalone' } : {}),
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
