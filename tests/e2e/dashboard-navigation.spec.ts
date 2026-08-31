@@ -1,6 +1,20 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Dashboard & Global Navigation E2E Flow', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem('itsm_auth_token', 'mock_e2e_jwt_token');
+      localStorage.setItem('itsm_tenant_id', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11');
+      localStorage.setItem('itsm_user_info', JSON.stringify({
+        id: '11111111-1111-1111-1111-111111111111',
+        name: 'IT Director Admin',
+        email: 'admin@company.com',
+        role: 'SuperAdmin',
+        tenant_id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'
+      }));
+    });
+  });
+
   test('should render Executive Dashboard with StatCards and Quick Actions', async ({ page }) => {
     await page.goto('/');
 

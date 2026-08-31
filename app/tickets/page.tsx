@@ -9,7 +9,6 @@ import { Input } from '../../src/components/ui/Input';
 import { Select } from '../../src/components/ui/Select';
 import { Modal } from '../../src/components/ui/Modal';
 import {
-  Ticket,
   Plus,
   Search,
   Clock,
@@ -23,10 +22,12 @@ import {
   Send,
 } from 'lucide-react';
 import { apiFetch } from '../../src/lib/api-client';
+import { Ticket, CannedResponse } from '../../src/types/domain';
 
 export default function TicketsPage() {
-  const [tickets, setTickets] = useState<any[]>([]);
+  const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('');
@@ -46,7 +47,7 @@ export default function TicketsPage() {
   const [newReporter, setNewReporter] = useState('');
 
   // Resolution & Canned Response
-  const [cannedResponses, setCannedResponses] = useState<any[]>([]);
+  const [cannedResponses, setCannedResponses] = useState<CannedResponse[]>([]);
   const [resolutionNotes, setResolutionNotes] = useState('');
   const [resolvingLoading, setResolvingLoading] = useState(false);
 
@@ -58,6 +59,7 @@ export default function TicketsPage() {
 
   const fetchTickets = async () => {
     setLoading(true);
+    setError(null);
     let url = '/api/v1/tickets?';
     if (search) url += `search=${encodeURIComponent(search)}&`;
     if (statusFilter) url += `status=${encodeURIComponent(statusFilter)}&`;
@@ -65,7 +67,9 @@ export default function TicketsPage() {
     if (categoryFilter) url += `category=${encodeURIComponent(categoryFilter)}&`;
 
     const res = await apiFetch(url);
-    if (res.data?.tickets) {
+    if (res.error) {
+      setError(res.error);
+    } else if (res.data?.tickets) {
       setTickets(res.data.tickets);
     }
     setLoading(false);
@@ -204,6 +208,19 @@ export default function TicketsPage() {
             </Button>
           </div>
         </div>
+
+        {/* Error Alert Banner */}
+        {error && (
+          <div className="p-3.5 bg-red-50 border border-red-200 rounded-xl flex items-center justify-between gap-3 text-xs text-danger">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 shrink-0" />
+              <span>{error}</span>
+            </div>
+            <Button size="sm" variant="ghost-danger" onClick={fetchTickets}>
+              ลองใหม่อีกครั้ง (Retry)
+            </Button>
+          </div>
+        )}
 
         {/* Filter Bar */}
         <Card className="p-3">

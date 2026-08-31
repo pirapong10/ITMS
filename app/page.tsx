@@ -15,15 +15,16 @@ import {
   AlertTriangle,
   Plus,
   ArrowRight,
-  TrendingUp,
   ShieldCheck,
   RefreshCw,
+  AlertCircle,
 } from 'lucide-react';
 import { apiFetch } from '../src/lib/api-client';
 import { useRouter } from 'next/navigation';
 
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [tickets, setTickets] = useState<any[]>([]);
   const [assets, setAssets] = useState<any[]>([]);
   const [licenses, setLicenses] = useState<any[]>([]);
@@ -32,6 +33,8 @@ export default function DashboardPage() {
 
   const fetchDashboardData = async () => {
     setLoading(true);
+    setError(null);
+
     const [tRes, aRes, lRes, cRes] = await Promise.all([
       apiFetch('/api/v1/tickets?limit=5'),
       apiFetch('/api/v1/assets?limit=5'),
@@ -39,10 +42,16 @@ export default function DashboardPage() {
       apiFetch('/api/v1/changes?limit=5'),
     ]);
 
+    const errorMsg = tRes.error || aRes.error || lRes.error || cRes.error;
+    if (errorMsg && !tRes.data && !aRes.data) {
+      setError(errorMsg);
+    }
+
     if (tRes.data?.tickets) setTickets(tRes.data.tickets);
     if (aRes.data?.assets) setAssets(aRes.data.assets);
     if (lRes.data?.licenses) setLicenses(lRes.data.licenses);
     if (cRes.data) setChanges(Array.isArray(cRes.data) ? cRes.data : (cRes.data as any).changes || []);
+    
     setLoading(false);
   };
 
@@ -73,12 +82,25 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* Error Alert Banner */}
+        {error && (
+          <div className="p-3.5 bg-red-50 border border-red-200 rounded-xl flex items-center justify-between gap-3 text-xs text-danger">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{error}</span>
+            </div>
+            <Button size="sm" variant="ghost-danger" onClick={fetchDashboardData}>
+              ลองใหม่อีกครั้ง (Retry)
+            </Button>
+          </div>
+        )}
+
         {/* KPI Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
             title="Active Helpdesk Tickets"
-            value={tickets.length > 0 ? openTicketsCount : 12}
-            subtext="3 เคสต้องได้รับการตอบกลับด่วน"
+            value={loading ? '...' : openTicketsCount}
+            subtext={openTicketsCount > 0 ? `${openTicketsCount} เคสกำลังดำเนินการ` : 'ไม่มีเคสค้างในระบบ'}
             icon={Ticket}
             variant="blue"
             trend={{ value: '12%', isPositive: false }}
@@ -93,15 +115,15 @@ export default function DashboardPage() {
           />
           <StatCard
             title="Managed IT Assets"
-            value={assets.length > 0 ? assets.length : 48}
+            value={loading ? '...' : assets.length}
             subtext="สินทรัพย์ฮาร์ดแวร์ & อุปกรณ์"
             icon={Laptop}
             variant="slate"
           />
           <StatCard
             title="Software Licenses"
-            value={licenses.length > 0 ? licenses.length : 14}
-            subtext="2 ไลเซนส์ใกล้หมดอายุใน 30 วัน"
+            value={loading ? '...' : licenses.length}
+            subtext="ไลเซนส์ซอฟต์แวร์ที่ใช้งาน"
             icon={Key}
             variant="amber"
           />
@@ -212,7 +234,7 @@ export default function DashboardPage() {
                     ) : (
                       <tr>
                         <td colSpan={5} className="py-8 text-center text-slate-400">
-                          ยังไม่มี Ticket ในระบบ
+                          {loading ? 'กำลังโหลดข้อมูล...' : 'ยังไม่มี Ticket ในระบบ'}
                         </td>
                       </tr>
                     )}
@@ -232,17 +254,17 @@ export default function DashboardPage() {
             <Card className="p-4 space-y-3">
               <div className="flex items-center justify-between pb-2 border-b border-border">
                 <span className="text-xs font-semibold text-slate-600">CAB Pending Changes</span>
-                <Badge variant="purple">{changes.filter((c) => c.status === 'Pending CAB').length || 1}</Badge>
+                <Badge variant="purple">{changes.filter((c) => c.status === 'Pending CAB').length || 0}</Badge>
               </div>
 
               <div className="flex items-center justify-between pb-2 border-b border-border">
                 <span className="text-xs font-semibold text-slate-600">Asset Warranties Expiring</span>
-                <Badge variant="amber">2</Badge>
+                <Badge variant="amber">0</Badge>
               </div>
 
               <div className="flex items-center justify-between pb-2 border-b border-border">
                 <span className="text-xs font-semibold text-slate-600">License Quota Depleted</span>
-                <Badge variant="red">1</Badge>
+                <Badge variant="red">0</Badge>
               </div>
 
               <div className="flex items-center justify-between">

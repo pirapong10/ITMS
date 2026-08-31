@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/navigation';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
@@ -60,7 +60,7 @@ export function Sidebar() {
           const Icon = item.icon;
 
           return (
-            <a
+            <Link
               key={item.name}
               href={item.href}
               className={clsx(
@@ -89,7 +89,7 @@ export function Sidebar() {
                   {item.badge}
                 </span>
               )}
-            </a>
+            </Link>
           );
         })}
       </nav>

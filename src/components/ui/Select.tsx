@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -17,7 +17,8 @@ export function Select({
   id,
   ...props
 }: SelectProps) {
-  const selectId = id || label?.toLowerCase().replace(/\s+/g, '-');
+  const generatedId = useId();
+  const selectId = id || generatedId;
 
   return (
     <div className="w-full space-y-1.5">

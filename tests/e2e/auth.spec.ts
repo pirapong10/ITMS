@@ -46,4 +46,17 @@ test.describe('Authentication & Onboarding E2E Flow', () => {
     await expect(page.getByLabel('Subdomain ระบบ')).toBeVisible();
     await expect(page.getByLabel('ชื่อ-นามสกุล (Admin Name)')).toBeVisible();
   });
+
+  test('should redirect unauthenticated users to login page', async ({ page }) => {
+    // Clear any existing localStorage
+    await page.goto('/login');
+    await page.evaluate(() => localStorage.clear());
+
+    // Try navigating to a protected page
+    await page.goto('/tickets');
+
+    // Should be redirected to /login
+    await expect(page).toHaveURL(/.*login/);
+  });
 });
+

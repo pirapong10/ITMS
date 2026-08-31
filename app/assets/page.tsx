@@ -22,10 +22,12 @@ import {
   Building,
 } from 'lucide-react';
 import { apiFetch } from '../../src/lib/api-client';
+import { Asset } from '../../src/types/domain';
 
 export default function AssetsPage() {
-  const [assets, setAssets] = useState<any[]>([]);
+  const [assets, setAssets] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
@@ -50,13 +52,16 @@ export default function AssetsPage() {
 
   const fetchAssets = async () => {
     setLoading(true);
+    setError(null);
     let url = '/api/v1/assets?';
     if (search) url += `search=${encodeURIComponent(search)}&`;
     if (statusFilter) url += `status=${encodeURIComponent(statusFilter)}&`;
     if (categoryFilter) url += `category=${encodeURIComponent(categoryFilter)}&`;
 
     const res = await apiFetch(url);
-    if (res.data?.assets) {
+    if (res.error) {
+      setError(res.error);
+    } else if (res.data?.assets) {
       setAssets(res.data.assets);
     }
     setLoading(false);
@@ -136,6 +141,19 @@ export default function AssetsPage() {
             </Button>
           </div>
         </div>
+
+        {/* Error Alert Banner */}
+        {error && (
+          <div className="p-3.5 bg-red-50 border border-red-200 rounded-xl flex items-center justify-between gap-3 text-xs text-danger">
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4 shrink-0" />
+              <span>{error}</span>
+            </div>
+            <Button size="sm" variant="ghost-danger" onClick={fetchAssets}>
+              ลองใหม่อีกครั้ง (Retry)
+            </Button>
+          </div>
+        )}
 
         {/* Filter Bar */}
         <Card className="p-3">
@@ -221,7 +239,7 @@ export default function AssetsPage() {
                       <td className="py-3 px-4 font-mono font-bold text-emerald-600">
                         ฿
                         {a.depreciation_info
-                          ? Math.round(a.depreciation_info.currentBookValue).toLocaleString()
+                          ? Math.round(a.depreciation_info.currentBookValue ?? a.depreciation_info.net_book_value ?? a.purchase_cost).toLocaleString()
                           : Number(a.purchase_cost).toLocaleString()}
                       </td>
                       <td className="py-3 px-4">

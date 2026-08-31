@@ -21,12 +21,14 @@ import {
   Calendar,
 } from 'lucide-react';
 import { apiFetch } from '../../src/lib/api-client';
+import { Project, ProjectTask } from '../../src/types/domain';
 
 export default function ProjectsPage() {
-  const [projects, setProjects] = useState<any[]>([]);
-  const [tasks, setTasks] = useState<any[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [tasks, setTasks] = useState<ProjectTask[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedProject, setSelectedProject] = useState<any | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   // New Project Modal
   const [newProjectOpen, setNewProjectOpen] = useState(false);
@@ -40,16 +42,21 @@ export default function ProjectsPage() {
   const [newTaskOpen, setNewTaskOpen] = useState(false);
   const [taskTitle, setTaskTitle] = useState('');
   const [taskDesc, setTaskDesc] = useState('');
-  const [taskStatus, setTaskStatus] = useState('Todo');
+  const [taskStatus, setTaskStatus] = useState<'Todo' | 'In Progress' | 'In Review' | 'Completed'>('Todo');
   const [taskAssignee, setTaskAssignee] = useState('');
   const [taskLoading, setTaskLoading] = useState(false);
 
   const fetchProjectsAndTasks = async () => {
     setLoading(true);
+    setError(null);
     const [pRes, tRes] = await Promise.all([
       apiFetch('/api/v1/projects'),
       apiFetch('/api/v1/tasks'),
     ]);
+
+    if (pRes.error || tRes.error) {
+      setError(pRes.error || tRes.error);
+    }
 
     if (pRes.data?.projects) {
       setProjects(pRes.data.projects);
@@ -58,7 +65,8 @@ export default function ProjectsPage() {
       }
     }
     if (tRes.data) {
-      setTasks(tRes.data);
+      const taskList = Array.isArray(tRes.data) ? tRes.data : (tRes.data as any).tasks || [];
+      setTasks(taskList);
     }
     setLoading(false);
   };
@@ -231,7 +239,8 @@ export default function ProjectsPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {kanbanColumns.map((col) => {
-              const colTasks = tasks.filter((t) => t.status === col.id);
+              const safeTasks = Array.isArray(tasks) ? tasks : [];
+              const colTasks = safeTasks.filter((t) => t.status === col.id);
 
               return (
                 <div key={col.id} className="bg-slate-100/70 p-3 rounded-xl border border-border space-y-3">
