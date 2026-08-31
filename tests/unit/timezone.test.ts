@@ -119,6 +119,7 @@ describe('Multi-Timezone Engine & Business Hours (Unit Tests)', () => {
         start: '18:00',
         end: '08:00',
         work_days: [1, 2, 3],
+        holidays: [],
       };
       const start = new Date('2026-08-24T10:00:00.000Z');
       const deadline = calculateBusinessHoursDeadline(start, 5, invalidConfig);

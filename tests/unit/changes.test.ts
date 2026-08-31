@@ -136,7 +136,7 @@ describe('Change Enablement & CAB (Unit Tests)', () => {
       });
 
       const change = await getChangeRequestById(tenantId, 'chg-1');
-      expect(change?.approvals.length).toBe(1);
+      expect(change?.approvals?.length).toBe(1);
     });
 
     it('should update change request', async () => {
@@ -174,7 +174,7 @@ describe('Change Enablement & CAB (Unit Tests)', () => {
       });
 
       expect(res.status).toBe('Pending CAB');
-      expect(res.approvals.length).toBe(1);
+      expect(res.approvals?.length).toBe(1);
     });
 
     it('should record CAB approval decision and transition to Approved when all agree', async () => {

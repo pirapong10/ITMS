@@ -374,6 +374,7 @@ describe('Ticket Validation & Operations (Unit Tests)', () => {
       });
 
       const res = await createCannedResponse(tenantId, {
+        category: 'General',
         title: 'Welcome',
         content: 'Hello, how can I help you?',
       });
