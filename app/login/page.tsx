@@ -11,7 +11,7 @@ import { apiFetch, setStoredToken, setStoredUser, setStoredTenantId } from '../.
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [tenantId, setTenantId] = useState('tenant-default');
+  const [tenantId, setTenantId] = useState('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -50,7 +50,7 @@ export default function LoginPage() {
     if (res.data?.token) {
       setStoredToken(res.data.token);
       setStoredUser(res.data.user);
-      setStoredTenantId(tenantId);
+      setStoredTenantId(res.data.tenant_id || tenantId);
       router.push('/');
     }
   };
@@ -73,21 +73,23 @@ export default function LoginPage() {
 
     if (res.data?.token) {
       setStoredToken(res.data.token);
-      setMfaModalOpen(false);
+      setStoredUser(res.data.user);
+      setStoredTenantId(res.data.tenant_id || tenantId);
       router.push('/');
     }
   };
 
   const fillDemo = (role: 'admin' | 'tech' | 'user') => {
+    setTenantId('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11');
     if (role === 'admin') {
       setEmail('admin@company.com');
       setPassword('Admin@123456');
     } else if (role === 'tech') {
       setEmail('tech@company.com');
-      setPassword('Tech@123456');
+      setPassword('Admin@123456');
     } else {
       setEmail('user@company.com');
-      setPassword('User@123456');
+      setPassword('Admin@123456');
     }
   };
 
