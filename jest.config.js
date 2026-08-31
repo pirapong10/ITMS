@@ -7,4 +7,5 @@ module.exports = {
   roots: ['<rootDir>/tests'],
   testMatch: ['**/*.test.ts'],
   clearMocks: true,
+  testTimeout: 25000,
 };

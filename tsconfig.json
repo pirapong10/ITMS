@@ -3,7 +3,9 @@
     "target": "es2022",
     "module": "commonjs",
     "lib": [
-      "es2022"
+      "dom",
+      "dom.iterable",
+      "esnext"
     ],
     "declaration": true,
     "outDir": "./dist",
@@ -32,7 +34,9 @@
     ]
   },
   "include": [
+    "next-env.d.ts",
     "src/**/*",
+    "app/**/*",
     "tests/**/*",
     "migrations/**/*",
     ".next/types/**/*.ts",
