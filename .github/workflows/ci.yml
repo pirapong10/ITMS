@@ -1,0 +1,72 @@
+name: Enterprise CI/CD Quality Pipeline
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-and-test:
+    name: Lint, Test Coverage & Build
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: itsm_admin
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: itsm_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgres://itsm_admin:password@localhost:5432/itsm_test
+      ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      JWT_SECRET: super_secret_jwt_key_for_testing
+      NODE_ENV: test
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: 1. Code Linting Check (ESLint)
+        run: npm run lint
+
+      - name: 2. TypeScript Static Type Check
+        run: npm run type-check
+
+      - name: 3. Run Unit Tests with Coverage (Target >= 80%)
+        run: npm run test:unit
+
+      - name: 4. Run PostgreSQL Database Migrations
+        run: npm run migrate
+
+      - name: 5. Run Integration Tests (Multi-tenant & APIs)
+        run: npm run test:int
+
+      - name: 6. Next.js Production Build
+        run: npm run build
+
+      - name: 7. Dependency Security Audit
+        run: npm run audit:sec
+        continue-on-error: true
