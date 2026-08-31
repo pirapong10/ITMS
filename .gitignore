@@ -4,5 +4,7 @@ coverage/
 dist/
 .DS_Store
 *.log
+playwright-report/
+test-results/
 
 .env.local

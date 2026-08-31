@@ -5,7 +5,7 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const url = request.nextUrl.clone();
   
-  // 1. ข้าม Middleware สำหรับ Root Path, Static Files และ API
+  // 1. Skip Middleware for Root, API, and Static assets
   if (
     pathname === '/' ||
     pathname.startsWith('/api') ||
@@ -16,31 +16,30 @@ export function proxy(request: NextRequest) {
   }
 
   // Extract subdomain (e.g., tenant1.localhost:3000 -> tenant1)
-  const hostname = request.headers.get('host') || '';
-  const subdomain = hostname.split('.')[0];
+  const hostWithoutPort = (request.headers.get('host') || '').split(':')[0];
+  const isLocalOrDirect = hostWithoutPort === 'localhost' || hostWithoutPort === '127.0.0.1' || !hostWithoutPort.includes('.');
+  const subdomain = hostWithoutPort.split('.')[0];
+
+  // If accessing without subdomain or on direct host
+  if (isLocalOrDirect || subdomain === 'localhost' || subdomain === 'www') {
+    return NextResponse.next();
+  }
 
   // Check auth token
   const token = request.cookies.get('auth_token')?.value;
-  
-  // If accessing a tenant subdomain (not localhost/www)
-  if (subdomain !== 'localhost' && subdomain !== 'www') {
-    if (!token) {
-      // Not authenticated, redirect to login
-      url.pathname = '/login';
-      return NextResponse.rewrite(url);
-    }
-    
-    try {
-      // Rewrite to include the subdomain in the path.
-      url.pathname = `/${subdomain}${pathname}`;
-      return NextResponse.rewrite(url);
-    } catch (e) {
-      url.pathname = '/login';
-      return NextResponse.rewrite(url);
-    }
+
+  if (!token) {
+    url.pathname = '/login';
+    return NextResponse.rewrite(url);
   }
   
-  return NextResponse.next();
+  try {
+    url.pathname = `/${subdomain}${pathname}`;
+    return NextResponse.rewrite(url);
+  } catch {
+    url.pathname = '/login';
+    return NextResponse.rewrite(url);
+  }
 }
 
 export const config = {

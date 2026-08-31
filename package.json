@@ -6,6 +6,7 @@
         "build": "next build",
         "test:unit": "jest tests/unit --coverage --runInBand --forceExit",
         "test:int": "jest tests/integration --runInBand --forceExit",
+        "test:e2e": "playwright test",
         "test:regression": "jest tests/regression --runInBand --forceExit",
         "audit:sec": "npm audit --audit-level=high",
         "migrate": "node-pg-migrate up",
@@ -27,6 +28,7 @@
         "zod": "^4.4.3"
     },
     "devDependencies": {
+        "@playwright/test": "^1.62.1",
         "@tailwindcss/postcss": "^4.3.3",
         "@types/bcrypt": "^6.0.0",
         "@types/jest": "^30.0.0",

@@ -42,7 +42,7 @@ export default function DashboardPage() {
     if (tRes.data?.tickets) setTickets(tRes.data.tickets);
     if (aRes.data?.assets) setAssets(aRes.data.assets);
     if (lRes.data?.licenses) setLicenses(lRes.data.licenses);
-    if (cRes.data) setChanges(cRes.data);
+    if (cRes.data) setChanges(Array.isArray(cRes.data) ? cRes.data : (cRes.data as any).changes || []);
     setLoading(false);
   };
 

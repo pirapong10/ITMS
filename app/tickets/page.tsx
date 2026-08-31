@@ -541,8 +541,11 @@ export default function TicketsPage() {
             />
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-slate-700">รายละเอียดเพิ่มเติม (Description)</label>
+              <label htmlFor="ticket-new-desc" className="block text-xs font-semibold text-slate-700">
+                รายละเอียดเพิ่มเติม (Description)
+              </label>
               <textarea
+                id="ticket-new-desc"
                 rows={4}
                 className="w-full text-xs p-3 bg-white border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary"
                 placeholder="ระบุรายละเอียดของปัญหา พฤติกรรมที่พบ ข้อความ Error code..."

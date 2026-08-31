@@ -25,8 +25,8 @@ export function setStoredToken(token: string) {
 }
 
 export function getStoredTenantId(): string {
-  if (typeof window === 'undefined') return 'tenant-default';
-  return localStorage.getItem(TENANT_KEY) || 'tenant-default';
+  if (typeof window === 'undefined') return 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
+  return localStorage.getItem(TENANT_KEY) || 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
 }
 
 export function setStoredTenantId(tenantId: string) {
