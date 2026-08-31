@@ -24,7 +24,7 @@ export function AppShell({ children }: AppShellProps) {
 
     if (!token && !isAuthPage) {
       // Redirect unauthenticated user to login
-      router.push(`/login?redirect=${encodeURIComponent(pathname || '/')}`);
+      router.replace(`/login?redirect=${encodeURIComponent(pathname || '/')}`);
     } else {
       setIsAuthChecking(false);
     }

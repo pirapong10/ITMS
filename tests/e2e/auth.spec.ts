@@ -50,12 +50,14 @@ test.describe('Authentication & Onboarding E2E Flow', () => {
   test('should redirect unauthenticated users to login page', async ({ page }) => {
     // Clear any existing localStorage
     await page.goto('/login');
-    await page.evaluate(() => localStorage.clear());
+    await page.evaluate(() => {
+      localStorage.clear();
+      sessionStorage.clear();
+    });
 
     // Try navigating to a protected page
     await page.goto('/tickets');
-
-    // Should be redirected to /login
+    await page.waitForURL(/.*login/, { timeout: 10000 });
     await expect(page).toHaveURL(/.*login/);
   });
 });
