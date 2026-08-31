@@ -5,9 +5,11 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const url = request.nextUrl.clone();
   
-  // 1. Skip Middleware for Root, API, and Static assets
+  // 1. Skip Middleware for Root, Auth, API, and Static assets
   if (
     pathname === '/' ||
+    pathname === '/login' ||
+    pathname === '/register' ||
     pathname.startsWith('/api') ||
     pathname.startsWith('/_next') ||
     pathname.includes('.')
@@ -15,17 +17,22 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Extract subdomain (e.g., tenant1.localhost:3000 -> tenant1)
+  // Extract hostname and host parts
   const hostWithoutPort = (request.headers.get('host') || '').split(':')[0];
-  const isLocalOrDirect = hostWithoutPort === 'localhost' || hostWithoutPort === '127.0.0.1' || !hostWithoutPort.includes('.');
-  const subdomain = hostWithoutPort.split('.')[0];
+  
+  // Direct access: localhost, 127.0.0.1, or main Vercel domain (*.vercel.app without tenant prefix)
+  const isDirectHost =
+    hostWithoutPort === 'localhost' ||
+    hostWithoutPort === '127.0.0.1' ||
+    !hostWithoutPort.includes('.') ||
+    (hostWithoutPort.endsWith('.vercel.app') && hostWithoutPort.split('.').length <= 3) ||
+    hostWithoutPort.startsWith('www.');
 
-  // If accessing without subdomain or on direct host
-  if (isLocalOrDirect || subdomain === 'localhost' || subdomain === 'www') {
+  if (isDirectHost) {
     return NextResponse.next();
   }
 
-  // Check auth token
+  const subdomain = hostWithoutPort.split('.')[0];
   const token = request.cookies.get('auth_token')?.value;
 
   if (!token) {
