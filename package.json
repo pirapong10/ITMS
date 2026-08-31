@@ -11,7 +11,8 @@
         "audit:sec": "npm audit --audit-level=high",
         "migrate": "node-pg-migrate up",
         "migrate:create": "node-pg-migrate create",
-        "seed": "ts-node scripts/seed.ts"
+        "seed": "ts-node scripts/seed.ts",
+        "secrets:generate": "node scripts/generate-secrets.js"
     },
     "dependencies": {
         "bcrypt": "^6.0.0",
