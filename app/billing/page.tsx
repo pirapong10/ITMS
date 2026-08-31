@@ -16,8 +16,10 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { apiFetch } from '../../src/lib/api-client';
+import { useToast } from '../../src/components/ui/ToastContext';
 
 export default function BillingPage() {
+  const { toast } = useToast();
   const [plans, setPlans] = useState<any[]>([]);
   const [currentSub, setCurrentSub] = useState<any | null>(null);
   const [invoices, setInvoices] = useState<any[]>([]);
@@ -34,9 +36,9 @@ export default function BillingPage() {
       apiFetch('/api/v1/billing/invoices'),
     ]);
 
-    if (pRes.data) setPlans(pRes.data);
+    if (pRes.data) setPlans(Array.isArray(pRes.data) ? pRes.data : (pRes.data as any).plans || []);
     if (sRes.data) setCurrentSub(sRes.data);
-    if (iRes.data) setInvoices(iRes.data);
+    if (iRes.data) setInvoices(Array.isArray(iRes.data) ? iRes.data : (iRes.data as any).invoices || []);
     setLoading(false);
   };
 
@@ -57,9 +59,11 @@ export default function BillingPage() {
 
     setCheckoutLoading(null);
 
-    if (res.data?.session_url) {
-      alert(`Stripe Checkout Session พร้อมใช้งาน: ${res.data.session_id}`);
+    if (res.data?.session_url || res.data?.session_id) {
+      toast.success(`Stripe Checkout Session พร้อมใช้งาน: ${res.data.session_id}`, 'Billing Checkout');
       fetchBillingData();
+    } else if (res.error) {
+      toast.error(res.error, 'เกิดข้อผิดพลาด');
     }
   };
 
@@ -298,7 +302,7 @@ export default function BillingPage() {
                         <Button
                           size="sm"
                           variant="ghost"
-                          onClick={() => alert(`ดาวน์โหลดใบเสร็จรับเงิน ${inv.invoice_number}`)}
+                          onClick={() => toast.info(`กำลังจัดเตรียมดาวน์โหลดใบเสร็จรับเงิน ${inv.invoice_number}...`, 'Invoice PDF')}
                         >
                           <Download className="w-3.5 h-3.5" />
                           <span>PDF</span>

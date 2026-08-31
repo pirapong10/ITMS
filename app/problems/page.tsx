@@ -20,8 +20,10 @@ import {
   HelpCircle,
 } from 'lucide-react';
 import { apiFetch } from '../../src/lib/api-client';
+import { useToast } from '../../src/components/ui/ToastContext';
 
 export default function ProblemsPage() {
+  const { toast } = useToast();
   const [problems, setProblems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -125,10 +127,15 @@ export default function ProblemsPage() {
     setResolveLoading(false);
 
     if (res.data) {
-      alert(`บันทึกการแก้ไขสำเร็จ! ปิดเคส Incident ที่เกี่ยวข้องโดยอัตโนมัติ ${res.data.cascadedTicketsCount} รายการ`);
+      toast.success(
+        `บันทึกการแก้ไขสำเร็จ! ปิดเคส Incident ที่เกี่ยวข้องโดยอัตโนมัติ ${res.data.cascadedTicketsCount} รายการ`,
+        'Problem Management'
+      );
       setResolveModalOpen(false);
       handleSelectProblem(probId);
       fetchProblems();
+    } else if (res.error) {
+      toast.error(res.error, 'เกิดข้อผิดพลาด');
     }
   };
 

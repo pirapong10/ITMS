@@ -47,8 +47,8 @@ test.describe('Authentication & Onboarding E2E Flow', () => {
     await expect(page.getByLabel('ชื่อ-นามสกุล (Admin Name)')).toBeVisible();
   });
 
-  test('should redirect unauthenticated users to login page', async ({ page }) => {
-    // Clear any existing localStorage
+  test('should redirect unauthenticated users to login page', async ({ context, page }) => {
+    await context.clearCookies();
     await page.goto('/login');
     await page.evaluate(() => {
       localStorage.clear();

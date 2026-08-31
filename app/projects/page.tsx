@@ -22,8 +22,10 @@ import {
 } from 'lucide-react';
 import { apiFetch } from '../../src/lib/api-client';
 import { Project, ProjectTask } from '../../src/types/domain';
+import { useToast } from '../../src/components/ui/ToastContext';
 
 export default function ProjectsPage() {
+  const { toast } = useToast();
   const [projects, setProjects] = useState<Project[]>([]);
   const [tasks, setTasks] = useState<ProjectTask[]>([]);
   const [loading, setLoading] = useState(true);
@@ -92,10 +94,13 @@ export default function ProjectsPage() {
     setProjLoading(false);
 
     if (res.data) {
+      toast.success('สร้างโครงการไอทีใหม่สำเร็จ!', 'IT Projects');
       setNewProjectOpen(false);
       setProjName('');
       setProjDesc('');
       fetchProjectsAndTasks();
+    } else if (res.error) {
+      toast.error(res.error, 'เกิดข้อผิดพลาด');
     }
   };
 
@@ -117,10 +122,13 @@ export default function ProjectsPage() {
     setTaskLoading(false);
 
     if (res.data) {
+      toast.success('สร้างงาน Task ใหม่สำเร็จ!', 'Kanban Board');
       setNewTaskOpen(false);
       setTaskTitle('');
       setTaskDesc('');
       fetchProjectsAndTasks();
+    } else if (res.error) {
+      toast.error(res.error, 'เกิดข้อผิดพลาด');
     }
   };
 
@@ -131,7 +139,10 @@ export default function ProjectsPage() {
     });
 
     if (res.data) {
+      toast.info(`ย้ายสถานะ Task เป็น ${newStatus} แล้ว`, 'Kanban Board');
       fetchProjectsAndTasks();
+    } else if (res.error) {
+      toast.error(res.error, 'เกิดข้อผิดพลาด');
     }
   };
 
@@ -402,11 +413,11 @@ export default function ProjectsPage() {
               <Select
                 label="สถานะเริ่มต้น"
                 value={taskStatus}
-                onChange={(e) => setTaskStatus(e.target.value)}
+                onChange={(e) => setTaskStatus(e.target.value as any)}
                 options={[
                   { value: 'Todo', label: 'To Do (รอดำเนินการ)' },
                   { value: 'In Progress', label: 'In Progress (กำลังทำ)' },
-                  { value: 'Review', label: 'In Review (ตรวจสอบ)' },
+                  { value: 'In Review', label: 'In Review (ตรวจสอบ)' },
                   { value: 'Completed', label: 'Completed (เสร็จสิ้น)' },
                 ]}
               />

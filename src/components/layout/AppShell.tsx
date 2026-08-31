@@ -5,8 +5,9 @@ import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { GlobalSearchModal } from './GlobalSearchModal';
 import { getStoredToken } from '../../lib/api-client';
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { Zap } from 'lucide-react';
+import { ToastProvider } from '../ui/ToastContext';
 
 export interface AppShellProps {
   children: React.ReactNode;
@@ -15,7 +16,6 @@ export interface AppShellProps {
 export function AppShell({ children }: AppShellProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [isAuthChecking, setIsAuthChecking] = useState(true);
-  const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
@@ -44,16 +44,18 @@ export function AppShell({ children }: AppShellProps) {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <Sidebar />
-      <div className="flex-1 flex flex-col min-w-0">
-        <Header onOpenSearch={() => setSearchOpen(true)} />
-        <main className="flex-1 p-4 lg:p-6 max-w-7xl w-full mx-auto overflow-y-auto">
-          {children}
-        </main>
-      </div>
+    <ToastProvider>
+      <div className="flex min-h-screen bg-background">
+        <Sidebar />
+        <div className="flex-1 flex flex-col min-w-0">
+          <Header onOpenSearch={() => setSearchOpen(true)} />
+          <main className="flex-1 p-4 lg:p-6 max-w-7xl w-full mx-auto overflow-y-auto">
+            {children}
+          </main>
+        </div>
 
-      <GlobalSearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
-    </div>
+        <GlobalSearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+      </div>
+    </ToastProvider>
   );
 }

@@ -23,8 +23,12 @@ import {
 } from 'lucide-react';
 import { apiFetch } from '../../src/lib/api-client';
 import { Ticket, CannedResponse } from '../../src/types/domain';
+import { useToast } from '../../src/components/ui/ToastContext';
+import { TableRowSkeleton } from '../../src/components/ui/Skeleton';
+import { EmptyState } from '../../src/components/ui/EmptyState';
 
 export default function TicketsPage() {
+  const { toast } = useToast();
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -180,7 +184,9 @@ export default function TicketsPage() {
     });
 
     if (res.data) {
-      alert(`แปลงเป็นบทความ Knowledge Base สำเร็จ! (ID: ${res.data.id})`);
+      toast.success(`แปลงเป็นบทความ Knowledge Base สำเร็จ! (ID: ${res.data.id})`, 'Knowledge Base');
+    } else if (res.error) {
+      toast.error(res.error, 'เกิดข้อผิดพลาด');
     }
   };
 
@@ -303,7 +309,9 @@ export default function TicketsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {tickets.length > 0 ? (
+                {loading ? (
+                  <TableRowSkeleton rows={5} columns={8} />
+                ) : tickets.length > 0 ? (
                   tickets.map((t) => (
                     <tr
                       key={t.id}
@@ -359,8 +367,13 @@ export default function TicketsPage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={8} className="py-12 text-center text-slate-400">
-                      ไม่พบข้อมูล Ticket ที่ตรงกับเงื่อนไข
+                    <td colSpan={8} className="p-0">
+                      <EmptyState
+                        title="ไม่พบข้อมูล Ticket"
+                        description="ยังไม่มีรายการแจ้งปัญหาตามเงื่อนไขการค้นหา ท่านสามารถสร้าง Ticket ใหม่เพื่อเริ่มติดตามงาน"
+                        actionLabel="เปิด Ticket ใหม่"
+                        onAction={() => setNewModalOpen(true)}
+                      />
                     </td>
                   </tr>
                 )}

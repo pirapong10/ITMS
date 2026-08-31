@@ -22,10 +22,15 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { apiFetch } from '../../src/lib/api-client';
+import { useToast } from '../../src/components/ui/ToastContext';
+import { CardSkeleton } from '../../src/components/ui/Skeleton';
+import { EmptyState } from '../../src/components/ui/EmptyState';
 
 export default function KnowledgePage() {
+  const { toast } = useToast();
   const [articles, setArticles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
@@ -45,13 +50,18 @@ export default function KnowledgePage() {
 
   const fetchArticles = async () => {
     setLoading(true);
+    setError(null);
     let url = `/api/v1/kb?search=${encodeURIComponent(search)}`;
     if (selectedCategory !== 'All') {
       url += `&category=${encodeURIComponent(selectedCategory)}`;
     }
 
     const res = await apiFetch(url);
-    if (res.data) setArticles(res.data);
+    if (res.data) {
+      setArticles(Array.isArray(res.data) ? res.data : (res.data as any).articles || []);
+    } else if (res.error) {
+      setError(res.error);
+    }
     setLoading(false);
   };
 
@@ -69,13 +79,18 @@ export default function KnowledgePage() {
 
   const handleSendFeedback = async (isHelpful: boolean) => {
     if (!selectedArticle) return;
-    await apiFetch(`/api/v1/kb/${selectedArticle.id}/feedback`, {
+    const res = await apiFetch(`/api/v1/kb/${selectedArticle.id}/feedback`, {
       method: 'POST',
       body: JSON.stringify({ is_helpful: isHelpful }),
     });
 
-    setFeedbackSent(true);
-    handleSelectArticle(selectedArticle.id);
+    if (res.data) {
+      setFeedbackSent(true);
+      toast.success('ขอบคุณสำหรับการประเมินบทความ!', 'KCS Feedback');
+      handleSelectArticle(selectedArticle.id);
+    } else if (res.error) {
+      toast.error(res.error, 'เกิดข้อผิดพลาด');
+    }
   };
 
   const handleCreateArticle = async (e: React.FormEvent) => {
@@ -98,10 +113,13 @@ export default function KnowledgePage() {
     setCreateLoading(false);
 
     if (res.data) {
+      toast.success('สร้างบทความ Knowledge Base ใหม่สำเร็จ!', 'Knowledge Base');
       setNewModalOpen(false);
       setTitle('');
       setContent('');
       fetchArticles();
+    } else if (res.error) {
+      toast.error(res.error, 'เกิดข้อผิดพลาด');
     }
   };
 
@@ -172,7 +190,11 @@ export default function KnowledgePage() {
 
         {/* Articles Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {articles.length > 0 ? (
+          {loading ? (
+            <div className="col-span-full">
+              <CardSkeleton count={6} />
+            </div>
+          ) : articles.length > 0 ? (
             articles.map((art) => (
               <Card
                 key={art.id}
@@ -217,9 +239,15 @@ export default function KnowledgePage() {
               </Card>
             ))
           ) : (
-            <Card className="col-span-full py-12 text-center text-xs text-slate-400">
-              ไม่พบบทความความรู้ในหมวดหมู่นี้
-            </Card>
+            <div className="col-span-full bg-surface border border-border rounded-xl p-8">
+              <EmptyState
+                icon={BookOpen}
+                title="ไม่พบบทความความรู้"
+                description={`ไม่พบบทความในหมวดหมู่ "${selectedCategory}" หรือคำค้นหา "${search}"`}
+                actionLabel="เพิ่มบทความแรก"
+                onAction={() => setNewModalOpen(true)}
+              />
+            </div>
           )}
         </div>
 

@@ -23,10 +23,15 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { apiFetch } from '../../src/lib/api-client';
+import { useToast } from '../../src/components/ui/ToastContext';
+import { TableRowSkeleton } from '../../src/components/ui/Skeleton';
+import { EmptyState } from '../../src/components/ui/EmptyState';
 
 export default function ChangesPage() {
+  const { toast } = useToast();
   const [changes, setChanges] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
 
@@ -60,12 +65,17 @@ export default function ChangesPage() {
 
   const fetchChanges = async () => {
     setLoading(true);
+    setError(null);
     let url = '/api/v1/changes?';
     if (search) url += `search=${encodeURIComponent(search)}&`;
     if (statusFilter) url += `status=${encodeURIComponent(statusFilter)}&`;
 
     const res = await apiFetch(url);
-    if (res.data) setChanges(res.data);
+    if (res.data) {
+      setChanges(Array.isArray(res.data) ? res.data : (res.data as any).changes || []);
+    } else if (res.error) {
+      setError(res.error);
+    }
     setLoading(false);
   };
 
@@ -101,12 +111,15 @@ export default function ChangesPage() {
     setCreateLoading(false);
 
     if (res.data) {
+      toast.success('สร้าง Change Request ใหม่สำเร็จ!', 'Change Request');
       setNewModalOpen(false);
       setTitle('');
       setDescription('');
       setImplPlan('');
       setRollbackPlan('');
       fetchChanges();
+    } else if (res.error) {
+      toast.error(res.error, 'เกิดข้อผิดพลาด');
     }
   };
 
@@ -122,9 +135,12 @@ export default function ChangesPage() {
     });
 
     if (res.data) {
+      toast.success('ส่งคำขอไปยังคณะกรรมการ CAB เรียบร้อยแล้ว', 'CAB Review');
       setCabModalOpen(false);
       handleSelectChange(changeId);
       fetchChanges();
+    } else if (res.error) {
+      toast.error(res.error, 'เกิดข้อผิดพลาด');
     }
   };
 
@@ -145,9 +161,12 @@ export default function ChangesPage() {
     setDecisionLoading(false);
 
     if (res.data) {
+      toast.success(`บันทึกผลการพิจารณา CAB: ${decision} เรียบร้อยแล้ว`, 'CAB Decision');
       setDecisionNotes('');
       handleSelectChange(changeId);
       fetchChanges();
+    } else if (res.error) {
+      toast.error(res.error, 'เกิดข้อผิดพลาด');
     }
   };
 
@@ -164,8 +183,11 @@ export default function ChangesPage() {
     });
 
     if (res.data) {
+      toast.success(`อัปเดตสถานะการปฏิบัติงาน: ${status} เรียบร้อยแล้ว`, 'PIR Execution');
       handleSelectChange(changeId);
       fetchChanges();
+    } else if (res.error) {
+      toast.error(res.error, 'เกิดข้อผิดพลาด');
     }
   };
 
@@ -247,7 +269,9 @@ export default function ChangesPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {changes.length > 0 ? (
+                {loading ? (
+                  <TableRowSkeleton rows={5} columns={8} />
+                ) : changes.length > 0 ? (
                   changes.map((c) => (
                     <tr
                       key={c.id}
@@ -301,8 +325,14 @@ export default function ChangesPage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={8} className="py-12 text-center text-slate-400">
-                      ไม่พบคำขอ Change Request ในระบบ
+                    <td colSpan={8} className="p-0">
+                      <EmptyState
+                        icon={GitPullRequest}
+                        title="ยังไม่มีคำขอ Change Request"
+                        description="สร้างคำขอเปลี่ยนแปลงระบบ (RFC) เพื่อส่งให้คณะกรรมการ CAB พิจารณาอนุมัติ"
+                        actionLabel="สร้างคำขอ Change ใหม่"
+                        onAction={() => setNewModalOpen(true)}
+                      />
                     </td>
                   </tr>
                 )}

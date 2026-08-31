@@ -23,8 +23,10 @@ import {
   Laptop,
 } from 'lucide-react';
 import { apiFetch } from '../../src/lib/api-client';
+import { useToast } from '../../src/components/ui/ToastContext';
 
 export default function OperationsPage() {
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<'pm' | 'routines' | 'borrow'>('pm');
   const [loading, setLoading] = useState(true);
 
@@ -48,7 +50,7 @@ export default function OperationsPage() {
   const [routineInspector, setRoutineInspector] = useState('');
   const [routineLoading, setRoutineLoading] = useState(false);
 
-  // Borrow Records
+  // Borrow / Return
   const [borrowRecords, setBorrowRecords] = useState<any[]>([]);
   const [newBorrowOpen, setNewBorrowOpen] = useState(false);
   const [borrowAssetId, setBorrowAssetId] = useState('');
@@ -65,9 +67,9 @@ export default function OperationsPage() {
       apiFetch('/api/v1/borrow-records'),
     ]);
 
-    if (pmRes.data) setPmSchedules(pmRes.data);
-    if (rRes.data) setRoutines(rRes.data);
-    if (bRes.data) setBorrowRecords(bRes.data);
+    if (pmRes.data) setPmSchedules(Array.isArray(pmRes.data) ? pmRes.data : (pmRes.data as any).schedules || []);
+    if (rRes.data) setRoutines(Array.isArray(rRes.data) ? rRes.data : (rRes.data as any).checklists || []);
+    if (bRes.data) setBorrowRecords(Array.isArray(bRes.data) ? bRes.data : (bRes.data as any).records || []);
     setLoading(false);
   };
 
@@ -80,8 +82,10 @@ export default function OperationsPage() {
       method: 'POST',
     });
     if (res.data) {
-      alert('บันทึกการทำ PM เรียบร้อยแล้ว! ระบบคำนวณวันกำหนดครั้งถัดไปอัตโนมัติ');
+      toast.success('บันทึกการทำ PM เรียบร้อยแล้ว! ระบบคำนวณวันกำหนดครั้งถัดไปอัตโนมัติ', 'Preventive Maintenance');
       fetchOperationsData();
+    } else if (res.error) {
+      toast.error(res.error, 'เกิดข้อผิดพลาด');
     }
   };
 
@@ -103,9 +107,12 @@ export default function OperationsPage() {
     setPmLoading(false);
 
     if (res.data) {
+      toast.success('สร้างกำหนดการ PM ใหม่สำเร็จ!', 'Preventive Maintenance');
       setNewPmOpen(false);
       setPmTitle('');
       fetchOperationsData();
+    } else if (res.error) {
+      toast.error(res.error, 'เกิดข้อผิดพลาด');
     }
   };
 
@@ -115,8 +122,10 @@ export default function OperationsPage() {
     });
 
     if (res.data) {
-      alert(`เปิด Helpdesk Ticket สำเร็จ! Ticket ID: ${res.data.id}`);
+      toast.success(`เปิด Helpdesk Ticket สำเร็จ! Ticket ID: ${res.data.id}`, 'Helpdesk Ticket');
       fetchOperationsData();
+    } else if (res.error) {
+      toast.error(res.error, 'เกิดข้อผิดพลาด');
     }
   };
 
@@ -162,10 +171,15 @@ export default function OperationsPage() {
     setBorrowLoading(false);
 
     if (res.data) {
+      toast.success('บันทึกการยืมอุปกรณ์สำเร็จ!', 'Borrow & Return');
       setNewBorrowOpen(false);
       setBorrowAssetId('');
       setBorrowerName('');
+      setBorrowerDept('');
+      setExpectedReturn('');
       fetchOperationsData();
+    } else if (res.error) {
+      toast.error(res.error, 'เกิดข้อผิดพลาด');
     }
   };
 
@@ -176,8 +190,10 @@ export default function OperationsPage() {
     });
 
     if (res.data) {
-      alert('บันทึกการคืนอุปกรณ์เรียบร้อยแล้ว สถานะสินทรัพย์เปลี่ยนเป็น In Stock');
+      toast.success('บันทึกการคืนอุปกรณ์เรียบร้อยแล้ว สถานะสินทรัพย์เปลี่ยนเป็น In Stock', 'Borrow & Return');
       fetchOperationsData();
+    } else if (res.error) {
+      toast.error(res.error, 'เกิดข้อผิดพลาด');
     }
   };
 

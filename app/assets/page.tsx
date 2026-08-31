@@ -23,8 +23,12 @@ import {
 } from 'lucide-react';
 import { apiFetch } from '../../src/lib/api-client';
 import { Asset } from '../../src/types/domain';
+import { useToast } from '../../src/components/ui/ToastContext';
+import { TableRowSkeleton } from '../../src/components/ui/Skeleton';
+import { EmptyState } from '../../src/components/ui/EmptyState';
 
 export default function AssetsPage() {
+  const { toast } = useToast();
   const [assets, setAssets] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -111,11 +115,14 @@ export default function AssetsPage() {
     setCreateLoading(false);
 
     if (res.data) {
+      toast.success('ลงทะเบียนสินทรัพย์ไอทีใหม่สำเร็จ!', 'IT Assets');
       setNewModalOpen(false);
       setName('');
       setModel('');
       setSerialNumber('');
       fetchAssets();
+    } else if (res.error) {
+      toast.error(res.error, 'เกิดข้อผิดพลาด');
     }
   };
 
@@ -222,7 +229,9 @@ export default function AssetsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {assets.length > 0 ? (
+                {loading ? (
+                  <TableRowSkeleton rows={5} columns={9} />
+                ) : assets.length > 0 ? (
                   assets.map((a) => (
                     <tr
                       key={a.id}
@@ -277,8 +286,14 @@ export default function AssetsPage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={9} className="py-12 text-center text-slate-400">
-                      ไม่พบข้อมูลสินทรัพย์ในระบบ
+                    <td colSpan={9} className="p-0">
+                      <EmptyState
+                        icon={Laptop}
+                        title="ไม่พบข้อมูลสินทรัพย์ไอที"
+                        description="ยังไม่มีรายการสินทรัพย์ตามเงื่อนไขการค้นหา ท่านสามารถลงทะเบียนสินทรัพย์ใหม่เพื่อเริ่มคำนวณค่าเสื่อมราคา"
+                        actionLabel="ลงทะเบียนสินทรัพย์ใหม่"
+                        onAction={() => setNewModalOpen(true)}
+                      />
                     </td>
                   </tr>
                 )}

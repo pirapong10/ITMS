@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { ToastProvider } from '../src/components/ui/ToastContext';
 
 export const metadata: Metadata = {
   title: 'ITSM Enterprise — SaaS Platform',
@@ -14,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="th" className="h-full">
       <body className="h-full bg-background text-dark antialiased">
-        {children}
+        <ToastProvider>{children}</ToastProvider>
       </body>
     </html>
   );

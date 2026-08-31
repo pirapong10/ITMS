@@ -158,7 +158,10 @@ export interface Project {
   tenant_id: string;
   name: string;
   description?: string;
-  status: 'Active' | 'On Hold' | 'Completed';
+  category?: string;
+  budget?: number;
+  progress_percent?: number;
+  status: 'Active' | 'On Hold' | 'Completed' | string;
   start_date?: string;
   target_end_date?: string;
   created_at: string;

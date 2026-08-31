@@ -22,15 +22,17 @@ import {
   Check,
 } from 'lucide-react';
 import { apiFetch } from '../../src/lib/api-client';
+import { useToast } from '../../src/components/ui/ToastContext';
 
 export default function SuperAdminPage() {
+  const { toast } = useToast();
   const [overview, setOverview] = useState<any | null>(null);
   const [tenants, setTenants] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   // SCIM Token Generator State
   const [scimModalOpen, setScimModalOpen] = useState(false);
-  const [scimTenantId, setScimTenantId] = useState('tenant-default');
+  const [scimTenantId, setScimTenantId] = useState('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11');
   const [scimToken, setScimToken] = useState<string | null>(null);
   const [scimCopied, setScimCopied] = useState(false);
   const [scimLoading, setScimLoading] = useState(false);
@@ -50,7 +52,7 @@ export default function SuperAdminPage() {
     ]);
 
     if (oRes.data) setOverview(oRes.data);
-    if (tRes.data) setTenants(tRes.data);
+    if (tRes.data?.tenants) setTenants(tRes.data.tenants);
     setLoading(false);
   };
 
@@ -66,7 +68,10 @@ export default function SuperAdminPage() {
     });
 
     if (res.data) {
+      toast.success(`เปลี่ยนสถานะ Tenant เป็น ${nextStatus} เรียบร้อยแล้ว`, 'Tenant Status');
       fetchAdminData();
+    } else if (res.error) {
+      toast.error(res.error, 'เกิดข้อผิดพลาด');
     }
   };
 
@@ -81,6 +86,9 @@ export default function SuperAdminPage() {
 
     if (res.data?.raw_token) {
       setScimToken(res.data.raw_token);
+      toast.success('สร้าง SCIM Token ใหม่สำเร็จ!', 'SCIM Token');
+    } else if (res.error) {
+      toast.error(res.error, 'เกิดข้อผิดพลาด');
     }
   };
 
@@ -88,7 +96,7 @@ export default function SuperAdminPage() {
     e.preventDefault();
     setSsoLoading(true);
 
-    await apiFetch('/api/v1/sso/config', {
+    const res = await apiFetch('/api/v1/sso/config', {
       method: 'POST',
       body: JSON.stringify({
         provider_type: 'OIDC',
@@ -100,7 +108,12 @@ export default function SuperAdminPage() {
 
     setSsoLoading(false);
     setSsoModalOpen(false);
-    alert('บันทึกการตั้งค่า Enterprise SSO (OIDC/SAML) เรียบร้อยแล้ว!');
+
+    if (res.data) {
+      toast.success('บันทึกการตั้งค่า Enterprise SSO (OIDC/SAML) เรียบร้อยแล้ว!', 'SSO Config');
+    } else if (res.error) {
+      toast.error(res.error, 'เกิดข้อผิดพลาด');
+    }
   };
 
   return (
@@ -261,6 +274,7 @@ export default function SuperAdminPage() {
                     onClick={() => {
                       navigator.clipboard.writeText(scimToken);
                       setScimCopied(true);
+                      toast.info('คัดลอก SCIM Bearer Token เรียบร้อยแล้ว', 'Clipboard');
                       setTimeout(() => setScimCopied(false), 2000);
                     }}
                   >
