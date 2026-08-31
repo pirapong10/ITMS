@@ -3,8 +3,15 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
+const isRemoteDb =
+  process.env.DATABASE_URL?.includes('supabase') ||
+  process.env.DATABASE_URL?.includes('neon') ||
+  process.env.DATABASE_URL?.includes('aws') ||
+  process.env.NODE_ENV === 'production';
+
 export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
+  ssl: isRemoteDb ? { rejectUnauthorized: false } : undefined,
 });
 
 export const query = async (text: string, params?: any[]): Promise<QueryResult> => {
