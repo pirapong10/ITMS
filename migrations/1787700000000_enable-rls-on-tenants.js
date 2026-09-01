@@ -26,6 +26,20 @@ exports.shorthands = undefined;
  */
 
 exports.up = (pgm) => {
+  // ── 0. Ensure required roles exist (idempotent for test and CI environments) ──
+  pgm.sql(`
+    DO $$
+    BEGIN
+      IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'authenticated') THEN
+        CREATE ROLE authenticated NOLOGIN;
+      END IF;
+      IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'anon') THEN
+        CREATE ROLE anon NOLOGIN;
+      END IF;
+    END
+    $$;
+  `);
+
   // ── 1. Enable and force RLS ──────────────────────────────────────────────
   pgm.sql(`ALTER TABLE public.tenants ENABLE ROW LEVEL SECURITY;`);
   pgm.sql(`ALTER TABLE public.tenants FORCE ROW LEVEL SECURITY;`);
