@@ -45,7 +45,7 @@ export function Modal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity animate-in fade-in duration-150"
+        className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity animate-in fade-in duration-150"
         onClick={onClose}
       />
 
@@ -54,14 +54,14 @@ export function Modal({
         className={`relative w-full ${maxWidthClasses[maxWidth]} bg-surface border border-border rounded-xl shadow-lg z-10 overflow-hidden transform transition-all animate-in zoom-in-95 duration-150`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border bg-slate-50/50">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border bg-slate-50/50 dark:bg-slate-900/50">
           <div>
             <h3 className="text-sm font-bold text-dark">{title}</h3>
-            {description && <p className="text-xs text-slate-500 mt-0.5">{description}</p>}
+            {description && <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{description}</p>}
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-md text-slate-400 hover:text-dark hover:bg-slate-100 transition-all"
+            className="p-1 rounded-md text-slate-400 hover:text-dark hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
             aria-label="Close modal"
           >
             <X className="w-4 h-4" />

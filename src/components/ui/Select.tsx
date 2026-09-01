@@ -23,7 +23,7 @@ export function Select({
   return (
     <div className="w-full space-y-1.5">
       {label && (
-        <label htmlFor={selectId} className="block text-xs font-semibold text-slate-700">
+        <label htmlFor={selectId} className="block text-xs font-semibold text-slate-700 dark:text-slate-200">
           {label}
         </label>
       )}
@@ -31,7 +31,7 @@ export function Select({
         id={selectId}
         className={twMerge(
           clsx(
-            'w-full text-xs bg-white border border-border rounded-md px-3 py-2 text-dark focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer',
+            'w-full text-xs bg-surface border border-border rounded-md px-3 py-2 text-dark focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer',
             error && 'border-danger focus:ring-danger/20 focus:border-danger',
             className
           )
@@ -40,7 +40,7 @@ export function Select({
       >
         {options
           ? options.map((opt) => (
-              <option key={opt.value} value={opt.value}>
+              <option key={opt.value} value={opt.value} className="bg-surface text-dark">
                 {opt.label}
               </option>
             ))

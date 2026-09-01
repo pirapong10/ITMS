@@ -2,13 +2,13 @@ import React from 'react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
-export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type SkeletonProps = React.HTMLAttributes<HTMLDivElement>;
 
 export function Skeleton({ className, ...props }: SkeletonProps) {
   return (
     <div
       className={twMerge(
-        clsx('animate-pulse bg-slate-200/80 rounded-md', className)
+        clsx('animate-pulse bg-slate-200/80 dark:bg-slate-800/80 rounded-md', className)
       )}
       {...props}
     />

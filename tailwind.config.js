@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: 'class',
   content: [
     './app/**/*.{js,ts,jsx,tsx,mdx}',
     './src/**/*.{js,ts,jsx,tsx,mdx}',
@@ -7,37 +8,37 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        background: '#F8FAFC',
-        surface: '#FFFFFF',
+        background: 'var(--color-bg)',
+        surface: {
+          DEFAULT: 'var(--color-surface)',
+          secondary: 'var(--color-surface-secondary)',
+        },
         border: {
-          DEFAULT: '#E2E8F0',
-          soft: '#F1F5F9',
+          DEFAULT: 'var(--color-border)',
+          soft: 'var(--color-border-soft)',
         },
         primary: {
-          DEFAULT: '#2563EB',
-          hover: '#1D4ED8',
-          light: '#EFF6FF',
-          dark: '#1E40AF',
+          DEFAULT: 'var(--color-primary)',
+          hover: 'var(--color-primary-hover)',
+          light: 'var(--color-primary-light)',
+          foreground: 'var(--color-primary-foreground)',
         },
         dark: {
-          DEFAULT: '#0F172A',
-          hover: '#1E293B',
-          light: '#334155',
+          DEFAULT: 'var(--color-text-primary)',
+          hover: 'var(--color-text-secondary)',
+          light: 'var(--color-text-tertiary)',
         },
         success: {
-          DEFAULT: '#10B981',
-          light: '#ECFDF5',
-          dark: '#047857',
+          DEFAULT: 'var(--color-success)',
+          light: 'var(--color-success-bg)',
         },
         warning: {
-          DEFAULT: '#F59E0B',
-          light: '#FFFBEB',
-          dark: '#B45309',
+          DEFAULT: 'var(--color-warning)',
+          light: 'var(--color-warning-bg)',
         },
         danger: {
-          DEFAULT: '#EF4444',
-          light: '#FEF2F2',
-          dark: '#B91C1C',
+          DEFAULT: 'var(--color-danger)',
+          light: 'var(--color-danger-bg)',
         },
       },
       fontFamily: {

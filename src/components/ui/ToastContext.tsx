@@ -106,10 +106,10 @@ function ToastContainer({
         };
 
         const borderColors = {
-          success: 'border-emerald-200 bg-emerald-50/90 text-emerald-900',
-          error: 'border-red-200 bg-red-50/90 text-red-900',
-          warning: 'border-amber-200 bg-amber-50/90 text-amber-900',
-          info: 'border-blue-200 bg-blue-50/90 text-blue-900',
+          success: 'border-emerald-200 dark:border-emerald-800/80 bg-emerald-50/95 dark:bg-emerald-950/90 text-emerald-900 dark:text-emerald-100',
+          error: 'border-red-200 dark:border-red-800/80 bg-red-50/95 dark:bg-red-950/90 text-red-900 dark:text-red-100',
+          warning: 'border-amber-200 dark:border-amber-800/80 bg-amber-50/95 dark:bg-amber-950/90 text-amber-900 dark:text-amber-100',
+          info: 'border-blue-200 dark:border-blue-800/80 bg-blue-50/95 dark:bg-blue-950/90 text-blue-900 dark:text-blue-100',
         };
 
         return (
@@ -129,7 +129,7 @@ function ToastContainer({
             </div>
             <button
               onClick={() => onRemove(item.id)}
-              className="p-1 rounded-md text-slate-400 hover:text-dark transition-all shrink-0 cursor-pointer"
+              className="p-1 rounded-md text-slate-400 hover:text-dark dark:hover:text-white transition-all shrink-0 cursor-pointer"
               aria-label="Close notification"
             >
               <X className="w-3.5 h-3.5" />

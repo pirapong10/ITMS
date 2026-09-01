@@ -51,7 +51,7 @@ export function Sidebar() {
 
       {/* Navigation Links */}
       <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1 custom-scrollbar">
-        <div className="px-3 pb-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+        <div className="px-3 pb-1 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
           Service Management
         </div>
 
@@ -67,14 +67,14 @@ export function Sidebar() {
                 'flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition-all group',
                 isActive
                   ? 'bg-primary text-white shadow-xs'
-                  : 'text-slate-600 hover:bg-slate-50 hover:text-dark'
+                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/70 hover:text-dark dark:hover:text-white'
               )}
             >
               <div className="flex items-center gap-2.5">
                 <Icon
                   className={clsx(
                     'w-4 h-4 transition-colors',
-                    isActive ? 'text-white' : 'text-slate-400 group-hover:text-dark'
+                    isActive ? 'text-white' : 'text-slate-400 group-hover:text-dark dark:group-hover:text-white'
                   )}
                 />
                 <span>{item.name}</span>
@@ -83,7 +83,7 @@ export function Sidebar() {
                 <span
                   className={clsx(
                     'text-[10px] font-bold px-1.5 py-0.2 rounded-full',
-                    isActive ? 'bg-white/20 text-white' : 'bg-blue-50 text-primary'
+                    isActive ? 'bg-white/20 text-white' : 'bg-primary/10 text-primary'
                   )}
                 >
                   {item.badge}
@@ -95,13 +95,13 @@ export function Sidebar() {
       </nav>
 
       {/* Footer / System Status */}
-      <div className="p-3.5 border-t border-border bg-slate-50/50">
-        <div className="flex items-center justify-between text-[11px] text-slate-500">
+      <div className="p-3.5 border-t border-border bg-slate-50/50 dark:bg-slate-900/50">
+        <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="font-semibold text-slate-700">System Healthy</span>
+            <span className="font-semibold text-slate-700 dark:text-slate-300">System Healthy</span>
           </div>
-          <span className="text-[10px] font-mono text-slate-400">100% SLA</span>
+          <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">100% SLA</span>
         </div>
       </div>
     </aside>

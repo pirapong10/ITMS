@@ -22,7 +22,7 @@ export function Input({
   return (
     <div className="w-full space-y-1.5">
       {label && (
-        <label htmlFor={inputId} className="block text-xs font-semibold text-slate-700">
+        <label htmlFor={inputId} className="block text-xs font-semibold text-slate-700 dark:text-slate-200">
           {label}
         </label>
       )}
@@ -30,7 +30,7 @@ export function Input({
         id={inputId}
         className={twMerge(
           clsx(
-            'w-full text-xs bg-white border border-border rounded-md px-3 py-2 text-dark placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all',
+            'w-full text-xs bg-surface border border-border rounded-md px-3 py-2 text-dark placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all',
             error && 'border-danger focus:ring-danger/20 focus:border-danger',
             className
           )
@@ -38,7 +38,7 @@ export function Input({
         {...props}
       />
       {error && <p className="text-[11px] text-danger">{error}</p>}
-      {helperText && !error && <p className="text-[11px] text-slate-500">{helperText}</p>}
+      {helperText && !error && <p className="text-[11px] text-slate-500 dark:text-slate-400">{helperText}</p>}
     </div>
   );
 }

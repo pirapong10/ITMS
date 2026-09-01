@@ -12,10 +12,10 @@ import {
   Building2,
   CheckCircle2,
   Clock,
-  AlertTriangle,
 } from 'lucide-react';
-import { getStoredUser, clearSession, getStoredTenantId, setStoredTenantId } from '../../lib/api-client';
+import { getStoredUser, clearSession, getStoredTenantId } from '../../lib/api-client';
 import { useRouter } from 'next/navigation';
+import { ThemeToggle } from '../ui/ThemeToggle';
 
 export interface HeaderProps {
   onOpenSearch: () => void;
@@ -77,13 +77,13 @@ export function Header({ onOpenSearch }: HeaderProps) {
       <div className="flex items-center gap-3">
         <button
           onClick={onOpenSearch}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100/80 hover:bg-slate-200/70 text-slate-500 text-xs transition-all border border-border/60 w-52 sm:w-72 justify-between cursor-pointer"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-200/70 dark:hover:bg-slate-700/80 text-slate-500 dark:text-slate-400 text-xs transition-all border border-border/60 w-52 sm:w-72 justify-between cursor-pointer"
         >
           <div className="flex items-center gap-2">
-            <Search className="w-3.5 h-3.5 text-slate-400" />
+            <Search className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
             <span className="truncate">ค้นหาทั่วระบบ...</span>
           </div>
-          <kbd className="hidden sm:inline-block text-[10px] bg-white border border-slate-200 text-slate-400 px-1.5 py-0.5 rounded font-mono shadow-xs">
+          <kbd className="hidden sm:inline-block text-[10px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 px-1.5 py-0.5 rounded font-mono shadow-xs">
             ⌘K
           </kbd>
         </button>
@@ -91,20 +91,23 @@ export function Header({ onOpenSearch }: HeaderProps) {
         {/* Tenant Selector Tag */}
         <div
           title="Tenant Organization ID"
-          className="hidden md:flex items-center gap-1.5 text-xs text-slate-600 bg-slate-50 px-2.5 py-1 rounded-md border border-border max-w-[200px]"
+          className="hidden md:flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/60 px-2.5 py-1 rounded-md border border-border max-w-[200px]"
         >
           <Building2 className="w-3.5 h-3.5 text-primary shrink-0" />
           <span className="font-semibold text-dark truncate">{tenantId}</span>
         </div>
       </div>
 
-      {/* Right: Actions, Language/Currency & User Menu */}
-      <div className="flex items-center gap-2.5">
+      {/* Right: Actions, Theme Switcher, Language & User Menu */}
+      <div className="flex items-center gap-2">
+        {/* Theme Toggle Button */}
+        <ThemeToggle />
+
         {/* Language & Currency Pill Button */}
         <button
           onClick={toggleLanguage}
           title="สลับภาษาและสกุลเงิน (Switch Language / Currency)"
-          className="hidden sm:flex items-center gap-1.5 text-[11px] font-semibold text-slate-600 bg-slate-50 hover:bg-slate-100 px-2.5 py-1 rounded-md border border-border transition-all cursor-pointer"
+          className="hidden sm:flex items-center gap-1.5 text-[11px] font-semibold text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-800 px-2.5 py-1 rounded-md border border-border transition-all cursor-pointer"
         >
           <Globe className="w-3 h-3 text-slate-400" />
           <span>{lang === 'TH' ? 'TH / THB ฿' : 'EN / USD $'}</span>
@@ -114,18 +117,18 @@ export function Header({ onOpenSearch }: HeaderProps) {
         <div className="relative" ref={notifRef}>
           <button
             onClick={() => setNotifOpen(!notifOpen)}
-            className="p-2 rounded-lg text-slate-500 hover:text-dark hover:bg-slate-100 transition-all relative cursor-pointer"
+            className="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:text-dark hover:bg-slate-100 dark:hover:bg-slate-800 transition-all relative cursor-pointer"
             title="การแจ้งเตือนระบบ"
           >
             <Bell className="w-4 h-4" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full ring-2 ring-white" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full ring-2 ring-white dark:ring-slate-900" />
           </button>
 
           {notifOpen && (
             <div className="absolute right-0 mt-2 w-80 bg-surface border border-border rounded-xl shadow-lg py-2 z-50 animate-in fade-in zoom-in-95 duration-100">
               <div className="px-3.5 py-1.5 border-b border-border flex items-center justify-between">
                 <span className="text-xs font-bold text-dark">การแจ้งเตือน (Notifications)</span>
-                <span className="text-[10px] font-semibold text-primary bg-blue-50 px-1.5 py-0.5 rounded-full">
+                <span className="text-[10px] font-semibold text-primary bg-primary/10 px-1.5 py-0.5 rounded-full">
                   2 รายการ
                 </span>
               </div>
@@ -135,13 +138,13 @@ export function Header({ onOpenSearch }: HeaderProps) {
                     setNotifOpen(false);
                     router.push('/tickets');
                   }}
-                  className="p-3 hover:bg-slate-50 cursor-pointer transition-all"
+                  className="p-3 hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer transition-all"
                 >
                   <div className="flex items-start gap-2.5">
                     <Clock className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
                     <div>
                       <p className="text-xs font-semibold text-dark">SLA Warning: Ticket #TCK-001</p>
-                      <p className="text-[11px] text-slate-500">เหลือเวลาตอบกลับตาม SLA อีก 25 นาที</p>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400">เหลือเวลาตอบกลับตาม SLA อีก 25 นาที</p>
                     </div>
                   </div>
                 </div>
@@ -150,13 +153,13 @@ export function Header({ onOpenSearch }: HeaderProps) {
                     setNotifOpen(false);
                     router.push('/changes');
                   }}
-                  className="p-3 hover:bg-slate-50 cursor-pointer transition-all"
+                  className="p-3 hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer transition-all"
                 >
                   <div className="flex items-start gap-2.5">
                     <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
                     <div>
                       <p className="text-xs font-semibold text-dark">CAB Review Request</p>
-                      <p className="text-[11px] text-slate-500">มี Change Request ใหม่รอการอนุมัติ</p>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400">มี Change Request ใหม่รอการอนุมัติ</p>
                     </div>
                   </div>
                 </div>
@@ -169,7 +172,7 @@ export function Header({ onOpenSearch }: HeaderProps) {
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-slate-100 transition-all cursor-pointer"
+            className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
           >
             <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs">
               {user?.name ? user.name.charAt(0).toUpperCase() : <User className="w-3.5 h-3.5" />}
@@ -197,7 +200,7 @@ export function Header({ onOpenSearch }: HeaderProps) {
                     setDropdownOpen(false);
                     router.push('/admin');
                   }}
-                  className="w-full text-left px-3.5 py-1.5 text-xs text-slate-600 hover:bg-slate-50 flex items-center gap-2 cursor-pointer"
+                  className="w-full text-left px-3.5 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 cursor-pointer"
                 >
                   <ShieldCheck className="w-3.5 h-3.5 text-slate-400" />
                   Super Admin Console
@@ -207,7 +210,7 @@ export function Header({ onOpenSearch }: HeaderProps) {
               <div className="border-t border-border pt-1">
                 <button
                   onClick={handleLogout}
-                  className="w-full text-left px-3.5 py-1.5 text-xs text-danger hover:bg-red-50 flex items-center gap-2 cursor-pointer"
+                  className="w-full text-left px-3.5 py-1.5 text-xs text-danger hover:bg-red-50 dark:hover:bg-red-950/40 flex items-center gap-2 cursor-pointer"
                 >
                   <LogOut className="w-3.5 h-3.5 text-danger" />
                   ออกจากระบบ (Logout)
