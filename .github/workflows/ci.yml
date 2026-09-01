@@ -40,10 +40,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 20.x
+      - name: Setup Node.js 22.x
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 22.x
           cache: 'npm'
 
       - name: Install Dependencies
@@ -72,6 +72,9 @@ jobs:
 
       - name: 8. Run End-to-End (E2E) Browser Tests
         run: npm run test:e2e
+        env:
+          CI: true
+          PORT: 3000
 
       - name: 9. Upload Playwright Test Report Artifact
         if: always()
